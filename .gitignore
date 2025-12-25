@@ -1,0 +1,5 @@
+venv
+models/Qwen
+__pycache__/
+*.pyc
+ConversationHistory

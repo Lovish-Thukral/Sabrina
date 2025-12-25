@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+
+  "user": {
+    "name": "Lovish",
+    "user_os": "Ubuntu 24.04",
+    "default_shell": "bash"
+  },
+
+
+  "preferences": {
+    "response_style": "sarcastic",
+    "verbosity": "short"
+  }
+}

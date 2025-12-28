@@ -14,13 +14,13 @@ def add_message(role,content):
 
 
 def save_history(filename):
-    # 1. Define the full path
-    path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{filename}.txt"
-    # 2. (Recommended) Ensure the directory exists to avoid FileNotFoundError
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    # 3. Save the file (Fixed 'indent' capitalization)
-    with open(path, "w") as f:
-        json.dump(HISTORY_CONTAINER, f, indent=4)
+    if(len(MESSAGES) > 2) :
+        path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{filename}.txt"
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            json.dump(HISTORY_CONTAINER, f, indent=4)
+    else : 
+        print("No Coversation Found Exiting without saving")
 
 def message_to_prompt():
     prompt = ""

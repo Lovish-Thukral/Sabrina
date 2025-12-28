@@ -5,7 +5,7 @@ def format_user_metadata(meta: dict, request: str) -> str:
 
     if (user and request == "user"):
         lines.append(f"- Name: {user.get('name', 'Unknown')}")
-        lines.append(f"- Operating System : {user.get('user_os', 'unknown')}")
+        lines.append(f"- Gender: {user.get("gender", "unknown")}")
         lines.append(f"- Operating System : {user.get('user_os', 'unknown')}")
         lines.append(f"- Default Shell: {user.get('default_shell', 'unknown')}")
 

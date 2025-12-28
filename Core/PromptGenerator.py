@@ -11,8 +11,8 @@ def chat_prompt_InOut(agent, temperature: float, input: str) -> str:
                     stop=["<|im_end|>"],
                     temperature=temperature
                )
-     reply = out["choices"][0]["text"].strip()
-     add_message(role="Sabrina", content=reply)
+     reply = out["choices"][0]["text"]
+     add_message(role="Sabrina", content=reply.strip())
      return reply
 
 def system_promp_gen(agent, isboot = False) -> str:

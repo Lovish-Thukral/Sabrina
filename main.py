@@ -1,6 +1,7 @@
 from llama_cpp import Llama
 from helpers.MessagesContainer import save_history
-from Core.PromptGenerator import chat_prompt_InOut
+from Core.PromptGenerator import chat_prompt_InOut, system_promp_gen
+from helpers.CMND_Handler import CMND_Valid
 
 # ------------------------
 # init model
@@ -16,7 +17,7 @@ agent = Llama(
     verbose=False
 )
 
-
+system_promp_gen(agent=agent, isboot=True)
 
 def on_chat():
           while True:
@@ -26,6 +27,9 @@ def on_chat():
                     save_history(reply)
                     break
                reply = chat_prompt_InOut(agent=agent, temperature=0.1, input=user_input)
-               print(reply)      
+               print(reply)     
+               print(type(reply))
+               CMND_Valid(reply)
+
 
 on_chat()

@@ -11,6 +11,7 @@ from helpers.MataDataFormatter import format_user_metadata
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 SYSTEM_PROMPT_PATH = PROJECT_ROOT / "SystemPrompts" / "main.txt"
+SHELL_PROMPT_PATH = PROJECT_ROOT / "SystemPrompts" / "ShellRules.txt"
 MODEL_RULES_PATH = PROJECT_ROOT / "SystemPrompts" / "Formatter&Rules.txt"
 USER_METADATA_PATH = PROJECT_ROOT / "UserPrefrences" / "userMataData.json"
 
@@ -18,7 +19,8 @@ USER_METADATA_PATH = PROJECT_ROOT / "UserPrefrences" / "userMataData.json"
 for path_name, path in [
     ("SYSTEM_PROMPT", SYSTEM_PROMPT_PATH),
     ("MODEL_RULES", MODEL_RULES_PATH),
-    ("USER_METADATA", USER_METADATA_PATH)
+    ("USER_METADATA", USER_METADATA_PATH),
+    ("SHELL_PROMPT", SHELL_PROMPT_PATH)
 ]:
     if not path.exists():
         raise FileNotFoundError(f"{path_name}: {path}")
@@ -35,6 +37,9 @@ with open(MODEL_RULES_PATH, "r") as f:
 with open(USER_METADATA_PATH, "r") as f:
     USER_METADATA = json.load(f)
 
+with open(SHELL_PROMPT_PATH, "r") as f:
+    SHELL_RULES = f.read().strip()
+
 # Build base system prompt (raw content)
 SYSTEM_PROMPT_TEXT = "\n".join([
     MODEL_IDENTITY,
@@ -43,6 +48,14 @@ SYSTEM_PROMPT_TEXT = "\n".join([
     format_user_metadata(USER_METADATA, "user"),
 ])
 
+SHELL_PROMPT_TEXT = "\n".join([
+    MODEL_IDENTITY,
+    SHELL_RULES,
+    format_user_metadata(USER_METADATA, "system"),
+    format_user_metadata(USER_METADATA, "user"),
+    # format_user_metadata(USER_METADATA, "prefrences")
+
+])
 # ------------------------
 # System Prompt Generator
 # ------------------------
@@ -77,5 +90,15 @@ def chat_prompt() -> str:
 {SYSTEM_PROMPT_TEXT}
 <|im_end|>
 {chat_history}
+<|im_start|>assistant
+""".strip()
+
+def shell_prompt(logs:str) -> str:
+    chat_history = message_to_prompt() or ""
+    return f"""
+<|im_start|>system
+{SHELL_PROMPT_TEXT}
+<|im_end|>
+{chat_history + logs}
 <|im_start|>assistant
 """.strip()

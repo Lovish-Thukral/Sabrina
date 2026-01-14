@@ -43,7 +43,7 @@ def on_chat():
                           print(x)
                           continue
                     if status == "Success":
-                          x = chat_prompt_gen(agent=agent, input=f"System: Execution Success, ask next action \n Shell: {CMND_response["Shell"]}")
+                          x = chat_prompt_gen(agent=agent, input=f"System: ask user next action as per resoponse \n Shell: {CMND_response["Shell"]}")
                           print (x)
                           continue
                     if status == "Failed":

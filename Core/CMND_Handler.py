@@ -3,7 +3,7 @@ import shlex
 from getpass import getpass
 from helpers.MessagesContainer import HISTORY_CONTAINER
 from Core.PromptGenerator import shell_prompt_gen
-import pexpect
+# import pexpect
 
 
 #-------------------------------------------------------------
@@ -13,7 +13,7 @@ DangerousWords = {"-rf", "--no-preserve-root", "GRUB", "modprobe", "insmod", "rm
 DangerousCombinationsA = { "ip" }
 DangerousCombinationsB = {"link", "route"}
 
-def Command_Executer(Command: str, Dangerous: str):
+def Command_Executer(Command: str, Dangerous = "yes"):
     """ Executes the Command via shell to the system; prop- { commands: command to execute, dangerous: yes/no} """
 
 #-------------------------------------------------------------
@@ -48,21 +48,28 @@ def Command_Executer(Command: str, Dangerous: str):
 # MAIN EXECUTION AND CAPUTRING AS TEXT 
 #-------------------------------------------------------------
     try:
-        if (Dangerous.lower() == "yes" or "sudo" in cmnd):
-            password = getpass("Enter Your Password")
-            shell = subprocess.run(
-                cmnd, input=password + "\n", text=True, capture_output=True, check=True, stdout=subprocess.PIPE,
+        if Dangerous.lower() == "yes" or "sudo" in cmnd:
+                if "sudo" in cmnd and not "-S" in cmnd:
+                    cmnd.remove("sudo")
+                    cmnd.insert(0, "sudo")
+                    cmnd.insert(1, "-S")
 
-            )
-        else :
-            shell = subprocess.run(cmnd, text= True, capture_output=True, check=True)
+                password = getpass("Enter Your Password: ")
+                shell = subprocess.run(
+                    cmnd, 
+                    input=password + "\n", 
+                    text=True, 
+                    capture_output=True 
+                )
+        else:
+            shell = subprocess.run(cmnd, text=True, capture_output=True, check=True)
 
         HISTORY_CONTAINER.append({"Shell:", shell})
         return{
             "Status" : "Success",
             "Shell"  : shell
         }
-    except (subprocess.CalledProcessError,
+    except (ValueError, subprocess.CalledProcessError,
         subprocess.TimeoutExpired,
         FileNotFoundError,
         PermissionError,

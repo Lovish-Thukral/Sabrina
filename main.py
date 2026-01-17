@@ -36,6 +36,7 @@ def on_chat():
                print(reply)
                if(reply.get("CMND", "").lower() != "none"):
                     CMND_response = Command_Executer(Command=reply.get("CMND"), Dangerous=reply.get("DANGER"))
+                    print(CMND_response)
                     status = CMND_response["Status"]
                     if status == "Blocked":
                           HISTORY_CONTAINER.append(f"Blocked: {CMND_response["System"]}")
@@ -55,8 +56,6 @@ def on_chat():
                          if Error_Status == "Success":
                                x = chat_prompt_gen(agent=agent, input=f"System: Execution Success, ask next action \n Shell: {debug["Shell"]}")
                                continue
-                               
-
 on_chat()
 
 

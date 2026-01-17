@@ -10,7 +10,7 @@ def chat_prompt_gen(agent, input: str):
                     prompt= prompt,
                     max_tokens=512,
                     stop=["<|im_end|>"],
-                    temperature=0.1
+                    temperature=0.3
                )
      reply = out["choices"][0]["text"]
      add_message(role="Sabrina", content=reply.strip())

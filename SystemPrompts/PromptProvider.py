@@ -10,14 +10,12 @@ from helpers.MataDataFormatter import format_user_metadata
 # ------------------------
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
-SYSTEM_PROMPT_PATH = PROJECT_ROOT / "SystemPrompts" / "main.txt"
 SHELL_PROMPT_PATH = PROJECT_ROOT / "SystemPrompts" / "ShellRules.txt"
 MODEL_RULES_PATH = PROJECT_ROOT / "SystemPrompts" / "Formatter&Rules.txt"
 USER_METADATA_PATH = PROJECT_ROOT / "UserPrefrences" / "userMataData.json"
 
 # Verify files exist
 for path_name, path in [
-    ("SYSTEM_PROMPT", SYSTEM_PROMPT_PATH),
     ("MODEL_RULES", MODEL_RULES_PATH),
     ("USER_METADATA", USER_METADATA_PATH),
     ("SHELL_PROMPT", SHELL_PROMPT_PATH)
@@ -28,8 +26,6 @@ for path_name, path in [
 # ------------------------
 # Load static files
 # ------------------------
-with open(SYSTEM_PROMPT_PATH, "r") as f:
-    MODEL_IDENTITY = f.read().strip()
 
 with open(MODEL_RULES_PATH, "r") as f:
     MODEL_RULES = f.read().strip()
@@ -42,14 +38,12 @@ with open(SHELL_PROMPT_PATH, "r") as f:
 
 # Build base system prompt (raw content)
 SYSTEM_PROMPT_TEXT = "\n".join([
-    MODEL_IDENTITY,
     MODEL_RULES,
     format_user_metadata(USER_METADATA, "system"),
     format_user_metadata(USER_METADATA, "user"),
 ])
 
 SHELL_PROMPT_TEXT = "\n".join([
-    MODEL_IDENTITY,
     SHELL_RULES,
     format_user_metadata(USER_METADATA, "system"),
     format_user_metadata(USER_METADATA, "user"),
@@ -62,12 +56,11 @@ SHELL_PROMPT_TEXT = "\n".join([
 
 def system_prompt(isboot = False) -> str:
     """Generate initial system greeting prompt"""
-    now = datetime.now().strftime("%Y-%m-%d")
     
     if isboot:
-        task = "Greet user GM/GN for date {now} and ask about his/her day, don't mention time."
+        task = f"<No Command, just TTS> Greet user GM/GN for date {datetime.now().strftime("%Y-%m-%d")} and ask about his/her day, don't mention time."
     else:
-        task = "user just called you, serve him"
+        task = "<No Command, just TTS>  user said Hi!"
 
     return f"""
 <|im_start|>system

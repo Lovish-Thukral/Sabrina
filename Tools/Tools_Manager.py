@@ -1,5 +1,5 @@
 """
-Model Toolset Integration
+Model Toolset Integration queries your command for suitable actions.
 Provides access to the following core capabilities:
 * **Preferences:** User-specific settings and personalization.
 * **Search:** Real-time web information retrieval.

@@ -1,5 +1,6 @@
 import json
 import os
+from helpers.Screen_Operation import get_current_screen
 
 MAX_MESSAGES = 20
 MESSAGES = []
@@ -7,11 +8,11 @@ HISTORY_CONTAINER = []
 
 
 def add_message(role,content):
+    prompt = f"Currunt_Screen : {get_current_screen()}, \n {role} : {content}"
     if len(MESSAGES) >= MAX_MESSAGES:
         MESSAGES.pop(0) # Removing Oldest Message after system prompt
-    MESSAGES.append({"role" : role, "content" : content})
-    HISTORY_CONTAINER.append({"role" : role, "content" : content})
-
+    MESSAGES.append(prompt)
+    HISTORY_CONTAINER.append(prompt)
 
 def save_history(filename):
     if(len(MESSAGES) > 2) :

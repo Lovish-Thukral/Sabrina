@@ -3,3 +3,4 @@ models/Qwen
 __pycache__/
 *.pyc
 ConversationHistory
+temp.py

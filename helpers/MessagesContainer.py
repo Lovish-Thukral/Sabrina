@@ -8,11 +8,11 @@ HISTORY_CONTAINER = []
 
 
 def add_message(role,content):
-    prompt = f"Currunt_Screen : {get_current_screen()}, \n {role} : {content}"
+    prompt = f"Currunt_Screen : {get_current_screen()}, \n Prompt : {content}"
     if len(MESSAGES) >= MAX_MESSAGES:
-        MESSAGES.pop(0) # Removing Oldest Message after system prompt
-    MESSAGES.append(prompt)
-    HISTORY_CONTAINER.append(prompt)
+        MESSAGES.pop(0)
+    MESSAGES.append({"role" : role, "content" : prompt})
+    HISTORY_CONTAINER.append({"role" : role, "content" : prompt})
 
 def save_history(filename):
     if(len(MESSAGES) > 2) :

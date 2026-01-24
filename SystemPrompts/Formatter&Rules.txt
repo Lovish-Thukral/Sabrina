@@ -18,7 +18,7 @@ INPUT FORMAT
 {
   "Currunt Screen": "current screen",
   "User": "user query",
-  "System": "system state / prior actions"
+  "System": "data fetched for query"
 }
 
 GENERAL RULES

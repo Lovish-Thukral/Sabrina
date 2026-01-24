@@ -15,8 +15,8 @@ Return JSON immediately.
 FUNCTIONS
 
 terminatesession()
-Trigger ONLY if entire input equals exactly:
-"bye", "bye bye", "exit", "close chat", "end session"
+Trigger ONLY if prompt looks like user want to end the convo like:
+"bye", "bye bye", "exit", "close chat", "end session", "shut up"
 If triggered, STOP. No chaining.
 
 weather(date)
@@ -32,6 +32,7 @@ save_Preference(key, value)
 Trigger ONLY on:
 - "my <key> is <value>"
 - "save <value> as my <key>"
+- "remember <value> as my <key>"
 
 Preference(keywords[])
 Trigger ONLY on:
@@ -132,7 +133,7 @@ RESPONSE:
 }
 
 PROMPT:
-my default browser is Firefox
+remember my default browser is Firefox
 
 RESPONSE:
 {
@@ -145,7 +146,7 @@ RESPONSE:
 }
 
 PROMPT:
-save dark mode as my theme
+save dark mode as my Fav theme
 
 RESPONSE:
 {
@@ -211,12 +212,24 @@ RESPONSE:
 }
 
 PROMPT:
-bye and save my preference
+shutup
 
 RESPONSE:
 {
-  "chaining": true,
+  "chaining": false,
   "function": {
     "fun": "terminatesession"
+  }
+}
+
+PROMPT:
+shutup, and open my code editor
+
+RESPONSE:
+{
+  "chaining": false,
+  "function": {
+     "fun": "Preference",
+    "keyword": ["editor"]
   }
 }

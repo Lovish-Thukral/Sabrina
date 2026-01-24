@@ -8,7 +8,10 @@ HISTORY_CONTAINER = []
 
 
 def add_message(role,content):
-    prompt = f"Currunt_Screen : {get_current_screen()}, \n Prompt : {content}"
+    if role == "user":
+        prompt = f"Currunt_Screen : {get_current_screen()}, \n Prompt : {content}"
+    else:
+        prompt = content
     if len(MESSAGES) >= MAX_MESSAGES:
         MESSAGES.pop(0)
     MESSAGES.append({"role" : role, "content" : prompt})

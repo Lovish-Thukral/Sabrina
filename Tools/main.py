@@ -8,15 +8,16 @@ Provides access to the following core capabilities:
 * **Learning:** Educational resources and knowledge expansion.
 """
 
-def chat_prompt_gen(agent, input: str):
-     prompt = input
+from SystemPrompts.PromptProvider import functional_prompt
+def prompt_Analyzer(agent, input: str):
+     prompt = functional_prompt(f"User : {input}")
+     print(prompt)
      out = agent(
                     prompt= prompt,
-                    max_tokens=512,
-                    stop=["<|im_end|>"],
-                    temperature=0.3
+                    max_tokens=128,
+                    temperature=0.1
                )
      reply = out["choices"][0]["text"]
-     return response
+     return reply
 
 # add functional prompt and further query for mini llm

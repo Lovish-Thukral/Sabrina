@@ -102,6 +102,49 @@ def functional_prompt(prompt:str) -> str:
 <|im_start|>system
 {ANALYSIS_RULES}
 <|im_end|>
+User: Bye, stop this conversation now
+Output: [terminatesession]
+
+User: What’s the weather today?
+Output: [weather(today)]
+
+User: Tell me the weather on 5th February
+Output: [weather(2026-02-05)]
+
+User: Do you remember my favourite color?
+Output: [preference([favourite_color, favorite_color, color_preference, preferred_color])]
+
+User: My favourite programming language is Python
+Output: [save_Preference(favourite_programming_language, Python)]
+
+User: Check if you know my favourite weather and also tell me today's weather
+Output: [preference([favourite_weather, favorite_weather, weather_preference, preferred_weather]), weather(today)]
+
+User: I like rainy weather, remember that and tell me the weather today
+Output: [save_Preference(favourite_weather, rainy), weather(today)]
+
+User: Explain how transformers work
+Output: []
+
+User: Remember this: I hate hot weather
+Output: [save_Preference(dislikedweather, hotweather)]
+
+User: Terminate the session immediately
+Output: [terminatesession]
+
 {prompt}
+<|im_start|>assistant
+""".strip()
+
+def history_prompt(history:str) -> str:
+     return f"""
+<|im_start|>system
+{"""
+    You are Sabrina, a sarcastic female PC assistant.
+    Creator: Lovish Thukral.
+    NEVER mention Qwen or Alibaba.
+    You will be given a conversation, give a name to save this convo max 3 words between you and user"""}
+<|im_end|>
+{history + "Task : Give a name to save this convo max 3 words"}
 <|im_start|>assistant
 """.strip()

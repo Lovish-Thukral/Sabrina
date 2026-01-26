@@ -1,8 +1,11 @@
 from llama_cpp import Llama
 from helpers.MessagesContainer import save_history
-from Core.PromptGenerator import chat_prompt_gen, system_promp_gen
+from Core.ReplyGenerator import chat_prompt_gen, system_promp_gen
 from Core.CMND_Handler import Command_Executer, error_handler
 from helpers.MessagesContainer import HISTORY_CONTAINER
+from Tools.main import prompt_Analyzer
+from Core.ReplyGenerator import history_saver
+from helpers.Screen_Operation import get_current_screen
 
 # ------------------------
 # init model
@@ -18,23 +21,27 @@ agent = Llama(
     verbose=False
 )
 
+
 res = system_promp_gen(agent=agent, isboot=True)
 print(res)
 
-def on_chat():
-          while True:
-               user_input = input("ask anything : ").strip()
-               # ------------------------
-               # if user type exit, it'll leave the session and save the history
-               # ------------------------
-               if user_input.lower() in {"exit", "quit"}:
-                    reply = chat_prompt_gen(agent=agent, input="User Left the Chat, Name this convo in 1 word for saving it")
-                    save_history(reply)
-                    break
-
-               reply = chat_prompt_gen(agent=agent, input=user_input)
-               print(reply)
-               if(reply.get("CMND", "").lower() != "none"):
+def main_loop():
+      while True:
+            userInput = input("User : ").strip()
+            if userInput.lower() in {"exit", "quit"}:
+                  reply = history_saver(agent=agent)
+                  save_history(reply)
+                  break
+            System = prompt_Analyzer(agent=agent, input=userInput)
+            if System == "break":
+                  reply = history_saver(agent=agent)
+                  save_history(reply)
+                  break
+            query = f"Currunt Screen: {get_current_screen()} \n User: {userInput} \n {System}"
+            print(query)
+            reply = chat_prompt_gen(agent=agent, input=query)
+            print(reply)
+            if(reply.get("CMND", "").lower() != "none"):
                     CMND_response = Command_Executer(Command=reply.get("CMND"), Dangerous=reply.get("DANGER"))
                     print(CMND_response)
                     status = CMND_response["Status"]
@@ -48,7 +55,8 @@ def on_chat():
                           print (x)
                           continue
                     if status == "Failed":
-                         debug =  error_handler(agent=agent, err=CMND_response["Error_Found"])
+                         err = f"{query} \n Command: {reply.get("CMND")} \n Error_Found: {CMND_response["Error_Found"]}"
+                         debug =  error_handler(agent=agent, err=err)
                          Error_Status = debug["Status"]
                          if Error_Status == "Blocked":
                               print(debug.get("TTS", "The Command Exceeds the System policies, i can't execute the retrial"))
@@ -56,6 +64,5 @@ def on_chat():
                          if Error_Status == "Success":
                                x = chat_prompt_gen(agent=agent, input=f"System: Execution Success, ask next action \n Shell: {debug["Shell"]}")
                                continue
-on_chat()
 
-
+main_loop()

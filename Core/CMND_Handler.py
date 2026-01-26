@@ -2,14 +2,14 @@ import subprocess
 import shlex
 from getpass import getpass
 from helpers.MessagesContainer import HISTORY_CONTAINER
-from Core.PromptGenerator import shell_prompt_gen
+from Core.ReplyGenerator import shell_prompt_gen
 # import pexpect
 
 
 #-------------------------------------------------------------
 # These Words Are Ignored for exectution for security reasons
 #-------------------------------------------------------------
-DangerousWords = {"-rf", "--no-preserve-root", "GRUB", "modprobe", "insmod", "rmmod", "lsmod", "iptables", "ip6tables", "nft", "ufw", "firewalld", "tc", "shutdown", "reboot", "poweroff", "halt", "init", "telinit", "systemctl", "mkfs", "mkfs.ext4", "mkfs.vfat", "fsck", "fsck.ext4", "mount", "umount", "dd", "wipefs", "blkdiscard", "parted", "fdisk", "cfdisk", "sfdisk", "losetup", "cryptsetup", "grub", "grub-install", "grub-mkconfig", "update-grub", "bios", "uefi", "efibootmgr", "bootctl", "shim", "fwupd", "fwupdmgr"}
+DangerousWords = {"-rf", "--no-preserve-root", "GRUB", "modprobe", "insmod", "rmmod", "lsmod", "iptables", "ip6tables", "nft", "ufw", "firewalld", "tc", "shutdown", "reboot", "poweroff", "halt", "init", "telinit", "systemctl", "mkfs", "mkfs.ext4", "mkfs.vfat", "fsck", "fsck.ext4", "mount", "umount", "dd", "wipefs", "blkdiscard", "parted", "fdisk", "cfdisk", "sfdisk", "losetup", "cryptsetup", "grub", "grub-install", "grub-mkconfig", "update-grub", "bios", "uefi", "efibootmgr", "bootctl", "shim", "fwupd", "fwupdmgr", "vim", "nano"}
 DangerousCombinationsA = { "ip" }
 DangerousCombinationsB = {"link", "route"}
 

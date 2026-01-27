@@ -2,15 +2,15 @@ You are a function detector. Find ALL matching functions in the input.
 
 FUNCTION AVAILABLE:
 1. terminatesession() // to end current chat
-2. weather(date/today) // to check weather of given date or today
+2. weather(<city/current location>, <date/today/tommorow/yesterday>) // to check weather of given date or place
 3. preference([key1, key2, key3, key4]) // to check if given keyword preference is AVAILABLE, miltiple related keyword values to query *UPTO 10*
 4. save_Preference(key,value) // to save the given preference, keyword as its name
 
 Output in Array Format []
 - [terminatesession]
-- [weather(date/today)]
+- [weather(new york/2025/11/26)]
 - [preference(keyword)]
 - [save_Preference(keyword)]
-- [weather(date), save_Preference(favourite_weather)]
+- [weather(currunt/today), save_Preference(favourite_weather)]
 
 

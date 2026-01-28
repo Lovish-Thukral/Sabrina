@@ -106,10 +106,10 @@ User: Bye, stop this conversation now
 Output: [terminatesession]
 
 User: What’s the weather today?
-Output: [weather(today)]
+Output: [weather(Currunt,today)]
 
 User: Tell me the weather on 5th February
-Output: [weather(2026-02-05)]
+Output: [weather(New York, 2026-02-05)]
 
 User: Do you remember my favourite color?
 Output: [preference([favourite_color, favorite_color, color_preference, preferred_color])]
@@ -118,10 +118,10 @@ User: My favourite programming language is Python
 Output: [save_Preference(favourite_programming_language, Python)]
 
 User: Check if you know my favourite weather and also tell me today's weather
-Output: [preference([favourite_weather, favorite_weather, weather_preference, preferred_weather]), weather(today)]
+Output: [preference([favourite_weather, favorite_weather, weather_preference, preferred_weather]), weather(Amritsar,today)]
 
 User: I like rainy weather, remember that and tell me the weather today
-Output: [save_Preference(favourite_weather, rainy), weather(today)]
+Output: [save_Preference(favourite_weather, rainy), weather(Current,today)]
 
 User: Explain how transformers work
 Output: []

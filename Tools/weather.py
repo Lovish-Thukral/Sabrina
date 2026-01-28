@@ -46,6 +46,7 @@ def filter_weather(data: dict) -> dict:
 
 def is_valid_date(day: str) -> str | None:
     day = day.lower().strip()
+    print("day", day)
 
     if day == "today":
         return date.today().strftime("%Y-%m-%d")
@@ -57,13 +58,15 @@ def is_valid_date(day: str) -> str | None:
         return (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 
     try:
-        parsed = datetime.strptime(day, "%Y/%m/%d")
-        return parsed.strftime("%Y-%m-%d")
+        d = datetime.strptime(day, "%Y/%m/%d")
+        print(d.strftime("%Y-%m-%d"))
+        return d.strftime("%Y-%m-%d")
     except ValueError:
+        print("Date",ValueError)
         return None            
 
 def get_Location(city:str):
-    if not city.lower == "current" or "currant":
+    if not city.lower == "current":
         try:
             handler = ipinfo.getHandler()
             details = handler.getDetails()
@@ -81,23 +84,52 @@ async def _get_weather_async(city, day):
     api_url = os.getenv("WEATHER_BASE_URL")
 
     if not api_key or not api_url or not place or not date:
-        return("Weather API is not Working")
+        return {
+            "success" : False,
+            "system" : "Improper Values",
+            "place" : place,
+            "date" : date
+        }
     
     url = f"{api_url}/{place}/{date}?key={api_key}" 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = await client.get(url)
+            response.raise_for_status()
+            data = filter_weather(response.json())
+            return {
+                "success": True,
+                "system" : f"Fetched Weather Details by System for {city} on {day}",
+                "data": data
+            }
+
+        except httpx.HTTPStatusError as e:
+            return {
+                "success": False,
+                "system": "http_error from the API, Report User You Cant Fetch Weather",
+                "status_code": e.response.status_code
+            }
+
+        except httpx.RequestError:
+            return {
+                "success": False,
+                "system": "Report User About No Internet Access so you can't fetch weather",
+                "error": "request_failed"
+            }
 
 def get_weather(city, d):
-    """Fetches Weather of a Given City and Date."""
-    response =  asyncio.run(_get_weather_async(city, d))
-    weather = filter_weather(response)
-    return {
-        "System" : "Fetched Weather API Data for {city} on {d}",
-        "Data" : weather
-    }
+    """
+Fetches weather data for a specified city and date.
+
+Args:
+    city (str): Name of the city or "current" for the user's location.
+    date (str): "today", "yesterday", "tomorrow", or a specific date.
+"""
+
+    weather =  asyncio.run(_get_weather_async(city=city, day=d))
+    return weather
+    
 
 
 if __name__ == "__main__":
-    print(get_weather("Ludhiana", "2026/01/29"))
+    print(get_weather("Ludhiana", "today"))

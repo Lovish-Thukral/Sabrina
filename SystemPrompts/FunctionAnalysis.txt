@@ -7,10 +7,8 @@ FUNCTION AVAILABLE:
 4. save_Preference(key,value) // to save the given preference, keyword as its name
 
 Output in Array Format []
-- [terminatesession]
-- [weather(new york/2025/11/26)]
-- [preference(keyword)]
-- [save_Preference(keyword)]
-- [weather(currunt/today), save_Preference(favourite_weather)]
+- array must be single, no multiple arrays
+- examples: [weather(currunt/today), save_Preference(favourite_weather)]
+- example 2: [save_Preference(keyword)]
 
 

@@ -8,24 +8,54 @@ Provides access to the following core capabilities:
 * **Learning:** Educational resources and knowledge expansion.
 """
 
+import re
+from datetime import datetime
 from SystemPrompts.PromptProvider import functional_prompt
 from Tools.weather import get_weather
 
-def SystemExecutions(fun:list):
+def array_Extract(array:list):
+     value = re.search("r\[(.*?)\]", array)
+     if value:
+          command_array = [item.strip() for item in value.group(1).split(',')]
+          return command_array
+
+def SystemExecutior(fun:list):
       terminatation = False
-      for fun in fun:
-            value ,sep, key = fun.partition("(")
+      system = ""
+      for f in fun:
+            string = f.strip()
+            value ,_, key = string.partition("(")
+            print(value,key)
             match value:
                   case "terminatesession":
                         terminatation = True
                   case "weather":
-                        
-                        
+                        city, _, date = key.partition(",")
+                        date = date.rstrip(" )")
+                        print(city, date)
+                        terminatation = False
+                        if re.fullmatch(r"[A-Za-z]+", city) and "/" in date:
+                            print(city, date)
+                            data = get_weather(city=city, d=date.strip())
+                            system += f"{value}: {data} "
+                        elif re.fullmatch(r"[A-Za-z]+", date) and "/" in city:
+                            data = get_weather(city=date, d=city)
+                            system += f"{value}: {data} "
+                        elif date.lower() in ["today", "yesterday", "tomorrow"]:
+                            data = get_weather(city=city, d=date)
+                            system += f"{value}: {data} "
+                        elif city.lower() in ["today", "yesterday", "tomorrow"]:
+                            data = get_weather(city=date, d=city)
+                            system += f"{value}: {data} "
+                        else:
+                            system += f"Improper Values Detected for {value} API, Cannot Fetch at the moment"
+                                          
 
-
-                  
             
-      return
+      return {
+            "terminatation": terminatation,
+            "System": system
+      }
 
 def prompt_Analyzer(agent, input: str):
      """
@@ -57,5 +87,9 @@ def prompt_Analyzer(agent, input: str):
                     temperature=0.1
                )
      reply = out["choices"][0]["text"]
-     return reply
+     commands = array_Extract(reply)
+     return commands
+
+
+     
 

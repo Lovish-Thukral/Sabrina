@@ -7,7 +7,7 @@ USER_METADATA_PATH = PROJECT_ROOT / "UserPrefrences" / "userMataData.json"
 TEMP_PATH = PROJECT_ROOT / "UserPrefrences" / "temp.json"
 
 
-def preference_checker(keys: list) -> str:
+def preference_finder(keys: list) -> str:
     """
     Return the value of the first matching key from the user's preferences.
     Args:
@@ -20,14 +20,16 @@ def preference_checker(keys: list) -> str:
         user_metadata = json.load(f)
 
     preferences = user_metadata.get("preferences", {})
+    print(preferences)
 
     if not preferences:
         raise ValueError("Preferences not found in metadata")
 
     for key in keys:
         value = preferences.get(key)
+        print(key)
         if value:
-            return value
+            return f"found {value} as {key} from database"
 
     return None
 
@@ -53,3 +55,7 @@ def save_preference(key: str, value) -> str:
 
     except Exception:
         return "Error Saving Preferences"
+    
+if __name__ == "__main__":
+    print(preference_finder(["default_code_editor"]))
+    print(save_preference("fav_weather", "Rainy"))

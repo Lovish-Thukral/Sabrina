@@ -1,16 +1,13 @@
 {
-  "version": "1.0",
-
-  "user": {
-    "name": "Lovish",
-    "gender": "Male",
-    "user_os": "Ubuntu 24.04",
-    "default_shell": "bash"
-  },
-
-
-  "preferences": {
-    "response_style": "sarcastic",
-    "verbosity": "short"
-  }
+    "version": "1.0",
+    "user": {
+        "name": "Lovish",
+        "gender": "Male",
+        "user_os": "Ubuntu 24.04",
+        "default_shell": "bash"
+    },
+    "preferences": {
+        "default_code_editor": "code",
+        "fav_weather": "Rainy"
+    }
 }

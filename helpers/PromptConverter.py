@@ -31,3 +31,4 @@ def array_Maker(array: str):
     # split only commas not inside parentheses
     items = re.split(r',\s*(?![^()]*\))', content)
     return [item.strip() for item in items]
+

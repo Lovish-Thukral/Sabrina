@@ -1,9 +1,8 @@
 from pathlib import Path
 from datetime import datetime
 import json
-
 from helpers.MessagesContainer import message_to_prompt
-from helpers.MataDataFormatter import format_user_metadata
+
 
 # ------------------------
 # Paths (robust resolution from Core/)
@@ -40,6 +39,22 @@ with open(SHELL_PROMPT_PATH, "r") as f:
 
 with open(FUNCTIONAL_ANALYSIS_PATH, 'r') as f:
     ANALYSIS_RULES = f.read().strip()
+
+
+# ------------------------
+# Extract User Metadata from JSON
+# ------------------------
+def format_user_metadata(meta: dict, request: str) -> str:
+    lines = ['KNOWN USER INFO']
+    user = meta.get("user", {})
+
+    if (user and request == "user"):
+        lines.append(f"- Name: {user.get('name', 'Unknown')}")
+        lines.append(f"- Gender: {user.get("gender", "unknown")}")
+        lines.append(f"- Operating System : {user.get('user_os', 'unknown')}")
+        lines.append(f"- Default Shell: {user.get('default_shell', 'unknown')}")
+    return "\n".join(lines)
+
 
 # Build base system prompt (raw content)
 SYSTEM_PROMPT_TEXT = "\n".join([

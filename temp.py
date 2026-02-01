@@ -13,11 +13,22 @@ from main import agent
 from SystemPrompts.PromptProvider import functional_prompt
 from Tools.weather import get_weather
 
-def array_Extract(array:str):
-     value = re.search(r',\s*(?![^\[]*\])', array)
-     if value:
-          command_array = [item.strip() for item in value.group(1).split(',')]
-          return command_array
+import re
+
+def array_Extract(array: str):
+    match = re.search(r'\[(.*)\]', array)
+    if not match:
+        return None
+
+    content = match.group(1)
+
+    # split only commas not inside parentheses
+    items = re.split(r',\s*(?![^()]*\))', content)
+    return [item.strip() for item in items]
+
+
+print(array_Extract("[weather(Currunt,today), terminatesession]"))
+
 
 def SystemExecutior(fun:list):
       terminatation = False
@@ -57,43 +68,44 @@ def SystemExecutior(fun:list):
             "System": system
       }
 
-# def prompt_Analyzer(agent, input: str):
-#      """
-#      Analyze a user prompt and extract all matching tool calls with their
-#      corresponding parameters, if present.
+def prompt_Analyzer(agent, input: str):
+     """
+     Analyze a user prompt and extract all matching tool calls with their
+     corresponding parameters, if present.
 
-#      This function inspects the input query, determines which predefined
-#      tools (functions) are applicable, and returns their names along with
-#      any inferred arguments in a structured format.
+     This function inspects the input query, determines which predefined
+     tools (functions) are applicable, and returns their names along with
+     any inferred arguments in a structured format.
 
-#      It is intended to be used as the decision layer for tool invocation,
-#      not for executing the tools themselves.
+     It is intended to be used as the decision layer for tool invocation,
+     not for executing the tools themselves.
 
-#      :param agent: The LLM instance used to analyze and interpret the prompt.
-#      :type agent: Any
+     :param agent: The LLM instance used to analyze and interpret the prompt.
+     :type agent: Any
 
-#      :param input: Raw user input prompt to be analyzed.
-#      :type input: str
+     :param input: Raw user input prompt to be analyzed.
+     :type input: str
 
-#      :return: A list of detected tool calls with resolved arguments.
-#      :rtype: list
-#      """
+     :return: A list of detected tool calls with resolved arguments.
+     :rtype: list
+     """
 
-#      prompt = functional_prompt(f"User : {input}")
-#      print(prompt)
-#      out = agent(
-#                     prompt= prompt,
-#                     max_tokens=128,
-#                     temperature=0.1
-#                )
-#      reply = out["choices"][0]["text"]
-#      print(reply)
-#      commands = array_Extract(reply)
-#      print(commands)
-#      return commands
+     prompt = functional_prompt(f"User : {input}")
+     print(prompt)
+     out = agent(
+                    prompt= prompt,
+                    max_tokens=128,
+                    temperature=0.1
+               )
+     reply = out["choices"][0]["text"]
+     commands = array_Extract(reply)
+     return commands
 
-# print(prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth"))
-print(array_Extract("[weather(Currunt,today), terminatesession]"))
+comm = prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth")
+print(SystemExecutior(comm))
+
+if __name__ == "__main__":
+     print(prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth"))
 
      
 

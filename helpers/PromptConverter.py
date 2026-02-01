@@ -1,5 +1,6 @@
 import json
-def maker(reply: str) -> dict:
+import re
+def JSON_maker(reply: str) -> dict:
    """
    Returns JSON FOR of provided string
    :type reply: str
@@ -19,3 +20,14 @@ def maker(reply: str) -> dict:
        
    except (json.JSONDecodeError, ValueError) as e:
        print(f"Failed to parse JSON: {e}")
+
+def array_Maker(array: str):
+    match = re.search(r'\[(.*)\]', array)
+    if not match:
+        return None
+
+    content = match.group(1)
+
+    # split only commas not inside parentheses
+    items = re.split(r',\s*(?![^()]*\))', content)
+    return [item.strip() for item in items]

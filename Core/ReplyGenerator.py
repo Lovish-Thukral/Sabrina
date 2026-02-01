@@ -1,7 +1,7 @@
 from SystemPrompts.PromptProvider import chat_prompt, shell_prompt
 from helpers.MessagesContainer import add_message
 from SystemPrompts.PromptProvider import system_prompt
-from helpers.JSON_maker import maker
+from helpers.PromptConverter import JSON_maker
 from SystemPrompts.PromptProvider import history_prompt
 
 def chat_prompt_gen(agent, input: str):
@@ -15,7 +15,7 @@ def chat_prompt_gen(agent, input: str):
                )
      reply = out["choices"][0]["text"]
      add_message(role="Sabrina", content=reply.strip())
-     response = maker(reply)
+     response = JSON_maker(reply)
      return response
 
 def system_promp_gen(agent, isboot = False):
@@ -27,7 +27,7 @@ def system_promp_gen(agent, isboot = False):
          temperature=0.9
      )
      reply = output["choices"][0]["text"].strip()
-     response = maker(reply)
+     response = JSON_maker(reply)
      return response
 
 def history_saver(agent):
@@ -56,16 +56,16 @@ def shell_prompt_gen(agent, input: str, temp = 0.1, tokens = 1024):
         reply = output["choices"][0]["text"]
         print(f"DEBUG: Raw LLM response:\n{reply}")
         
-        response = maker(reply)
+        response = JSON_maker(reply)
         
         if response is None:
-            print("WARNING: maker returned None")
+            print("WARNING: JSON_maker returned None")
             response = {
                 "ispossible": "no",
                 "CMND": "none",
                 "TTS": "System error in response generation",
                 "DANGER": "NO",
-                "ERROR": "MAKER_NONE"
+                "ERROR": "JSON_maker_NONE"
             }
         
         print(f"DEBUG: Parsed response: {response}")

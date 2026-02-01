@@ -9,15 +9,12 @@ Provides access to the following core capabilities:
 """
 
 import re
-from datetime import datetime
+# from main import agent
 from SystemPrompts.PromptProvider import functional_prompt
 from Tools.weather import get_weather
+from helpers.PromptConverter import array_Maker
+import re
 
-def array_Extract(array:list):
-     value = re.search("r\[(.*?)\]", array)
-     if value:
-          command_array = [item.strip() for item in value.group(1).split(',')]
-          return command_array
 
 def SystemExecutior(fun:list):
       terminatation = False
@@ -87,9 +84,11 @@ def prompt_Analyzer(agent, input: str):
                     temperature=0.1
                )
      reply = out["choices"][0]["text"]
-     commands = array_Extract(reply)
+     commands = array_Maker(reply)
      return commands
 
+# comm = prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth")
+# print(SystemExecutior(comm))
 
-     
-
+# if __name__ == "__main__":
+    #  print(prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth"))

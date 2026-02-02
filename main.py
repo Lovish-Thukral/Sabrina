@@ -4,7 +4,6 @@ from Core.ReplyGenerator import chat_prompt_gen, system_promp_gen
 from Core.CMND_Handler import Command_Executer, error_handler
 from helpers.MessagesContainer import HISTORY_CONTAINER
 from Tools.main import prompt_Analyzer
-from Core.ReplyGenerator import history_saver
 from helpers.Screen_Operation import get_current_screen
 
 # ------------------------
@@ -21,9 +20,6 @@ agent = Llama(
     verbose=False
 )
 
-
-
-
 def main_loop():
       res = system_promp_gen(agent=agent, isboot=True)
       print(res)
@@ -31,13 +27,14 @@ def main_loop():
             userInput = input("User : ").strip()
             System = prompt_Analyzer(agent=agent, input=userInput)
             if System["terminatation"] == True:
-                  reply = history_saver(agent=agent)
-                  save_history(reply)
+                  response = chat_prompt_gen(agent=agent, input=userInput)
+                  print(response)
+                  x = chat_prompt_gen(agent=agent, input="Name This Entire Convo in one word")
+                  name = x["TTS"]
+                  save_history(name)
                   break
             query = f"Currunt Screen: {get_current_screen()} \n User: {userInput} \n {System}"
-            print(query)
             reply = chat_prompt_gen(agent=agent, input=query)
-            print(reply)
             if(reply.get("CMND", "").lower() != "none"):
                     CMND_response = Command_Executer(Command=reply.get("CMND"), Dangerous=reply.get("DANGER"))
                     print(CMND_response)

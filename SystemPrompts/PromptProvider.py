@@ -150,16 +150,3 @@ Output: [terminatesession]
 {prompt}
 <|im_start|>assistant
 """.strip()
-
-def history_prompt(history:str) -> str:
-     return f"""
-<|im_start|>system
-{"""
-    You are Sabrina, a sarcastic female PC assistant.
-    Creator: Lovish Thukral.
-    NEVER mention Qwen or Alibaba.
-    You will be given a conversation, give a name to save this convo max 3 words between you and user"""}
-<|im_end|>
-{history + "Task : Give a name to save this convo max 3 words"}
-<|im_start|>assistant
-""".strip()

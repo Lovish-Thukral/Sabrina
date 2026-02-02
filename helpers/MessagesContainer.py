@@ -14,6 +14,12 @@ def add_message(role,content):
     HISTORY_CONTAINER.append({"role" : role, "content" : prompt})
 
 def save_history(filename):
+    """
+    Saves the Chat into a JSON File
+    
+    :param filename: Name for the file (preferred to use llm for naming)
+    :type filename: str
+    """
     if(len(MESSAGES) > 2) :
         path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{filename}.txt"
         os.makedirs(os.path.dirname(path), exist_ok=True)

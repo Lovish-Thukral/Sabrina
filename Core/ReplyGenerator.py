@@ -2,7 +2,6 @@ from SystemPrompts.PromptProvider import chat_prompt, shell_prompt
 from helpers.MessagesContainer import add_message
 from SystemPrompts.PromptProvider import system_prompt
 from helpers.PromptConverter import JSON_maker
-from SystemPrompts.PromptProvider import history_prompt
 
 def chat_prompt_gen(agent, input: str):
      add_message(role="user", content=input)
@@ -29,18 +28,6 @@ def system_promp_gen(agent, isboot = False):
      reply = output["choices"][0]["text"].strip()
      response = JSON_maker(reply)
      return response
-
-def history_saver(agent):
-    chat = chat_prompt()
-    prompt = history_prompt(chat)
-    output = agent(
-        prompt=prompt,
-        max_tokens=128,
-        temperature=0.7
-    )
-    reply = output["choices"][0]["text"].strip()
-    return reply
-
 
 def shell_prompt_gen(agent, input: str, temp = 0.1, tokens = 1024):
     try:

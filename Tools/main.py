@@ -9,12 +9,10 @@ Provides access to the following core capabilities:
 """
 
 import re
-# from main import agent
 from SystemPrompts.PromptProvider import functional_prompt
 from Tools.weather import get_weather
+from Tools.PrefrencesHandler import save_preference, preference_finder
 from helpers.PromptConverter import array_Maker
-import re
-
 
 def SystemExecutior(fun:list):
       terminatation = False
@@ -22,14 +20,14 @@ def SystemExecutior(fun:list):
       for f in fun:
             string = f.strip()
             value ,_, key = string.partition("(")
-            print(value,key)
-            match value:
+            key = key.replace(" ", "")
+            key = key.strip(")")
+            match value.lower():
                   case "terminatesession":
                         terminatation = True
                   case "weather":
-                        city, _, date = key.partition(",")
-                        date = date.rstrip(" )")
-                        print(city, date)
+                        city, _ , date = key.partition(",")
+                        print(city, "im", date)
                         terminatation = False
                         if re.fullmatch(r"[A-Za-z]+", city) and "/" in date:
                             print(city, date)
@@ -46,9 +44,14 @@ def SystemExecutior(fun:list):
                             system += f"{value}: {data} "
                         else:
                             system += f"Improper Values Detected for {value} API, Cannot Fetch at the moment"
-                                          
-
-            
+                  case "save_preference":
+                        name, _ , val = key.partition(",")
+                        response = save_preference(name, val)
+                        system += f"Save_Prefrence : \n system: {response["system"]}"
+                  case "prefrence":
+                        keywords = array_Maker(key)
+                        data = preference_finder(keywords)
+                        system += f"prefrence_finder: \n system:{data}"                  
       return {
             "terminatation": terminatation,
             "System": system
@@ -77,7 +80,6 @@ def prompt_Analyzer(agent, input: str):
      """
 
      prompt = functional_prompt(f"User : {input}")
-     print(prompt)
      out = agent(
                     prompt= prompt,
                     max_tokens=128,
@@ -85,10 +87,5 @@ def prompt_Analyzer(agent, input: str):
                )
      reply = out["choices"][0]["text"]
      commands = array_Maker(reply)
-     return commands
-
-# comm = prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth")
-# print(SystemExecutior(comm))
-
-# if __name__ == "__main__":
-    #  print(prompt_Analyzer(agent=agent, input="Check todays Weather and then shut your moouth"))
+     return SystemExecutior(commands)
+    

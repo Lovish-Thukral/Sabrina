@@ -136,13 +136,13 @@ User: Check if you know my favourite weather and also tell me today's weather
 Output: [preference([favourite_weather, favorite_weather, weather_preference, preferred_weather]), weather(Amritsar,today)]
 
 User: I like rainy weather, remember that and tell me the weather today
-Output: [save_Preference(favourite_weather, rainy), weather(Current,today)]
+Output: [save_preference(favourite_weather, rainy), weather(Current,today)]
 
 User: Explain how transformers work
 Output: []
 
 User: Remember this: I hate hot weather
-Output: [save_Preference(dislikedweather, hotweather)]
+Output: [save_preference(dislikedweather, hotweather)]
 
 User: Terminate the session immediately
 Output: [terminatesession]

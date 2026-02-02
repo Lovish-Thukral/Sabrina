@@ -23,17 +23,26 @@ def preference_finder(keys: list) -> str:
     print(preferences)
 
     if not preferences:
-        raise ValueError("Preferences not found in metadata")
-
+        return "No Related Prefrence Found in database"
+        
     for key in keys:
         value = preferences.get(key)
         print(key)
         if value:
             return f"found {value} as {key} from database"
-
-    return None
+            
 
 def save_preference(key: str, value) -> str:
+    """
+    Stores the provided key-values to user matadata as user's prefrences
+    
+    :param key: Name-hint of the data to remember
+    :type key: str
+    :param value: Value to store
+    :type value: str
+    :return: returns result after save
+    :rtype: str
+    """
     try:
         if USER_METADATA_PATH.exists():
             with open(USER_METADATA_PATH, "r") as f:
@@ -44,17 +53,15 @@ def save_preference(key: str, value) -> str:
         user_metadata.setdefault("preferences", {})
         user_metadata["preferences"][key] = value
 
-        # Write updated data to temp file
         with open(TEMP_PATH, "w") as f:
             json.dump(user_metadata, f, indent=4)
 
-        # Atomically replace original
         os.replace(TEMP_PATH, USER_METADATA_PATH)
 
         return f"Saved '{key}' as '{value}' in database."
 
     except Exception:
-        return "Error Saving Preferences"
+        return f"Error Saving Preferences {key}"
     
 if __name__ == "__main__":
     print(preference_finder(["default_code_editor"]))

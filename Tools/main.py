@@ -47,7 +47,7 @@ def SystemExecutior(fun:list):
                   case "save_preference":
                         name, _ , val = key.partition(",")
                         response = save_preference(name, val)
-                        system += f"Save_Prefrence : \n system: {response["system"]}"
+                        system += f"Save_Prefrence : \n system: {response}"
                   case "prefrence":
                         keywords = array_Maker(key)
                         data = preference_finder(keywords)

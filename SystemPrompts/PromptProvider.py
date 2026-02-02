@@ -138,7 +138,7 @@ Output: [preference([favourite_weather, favorite_weather, weather_preference, pr
 User: I like rainy weather, remember that and tell me the weather today
 Output: [save_preference(favourite_weather, rainy), weather(Current,today)]
 
-User: Explain how transformers work
+User: explain me the best book to be rich
 Output: []
 
 User: Remember this: I hate hot weather
@@ -146,6 +146,12 @@ Output: [save_preference(dislikedweather, hotweather)]
 
 User: Terminate the session immediately
 Output: [terminatesession]
+
+User: what is my fav word app ?
+Output: [prefrence([fav_word_app, fav_wordapp, fav_word_application, default_word_app])]
+ 
+User: What is my fav browser ?
+Output: [prefrence([fav_browser, favrouite_browser, default_browser])]
 
 {prompt}
 <|im_start|>assistant

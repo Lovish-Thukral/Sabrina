@@ -26,15 +26,18 @@ def main_loop():
       while True:
             userInput = input("User : ").strip()
             System = prompt_Analyzer(agent=agent, input=userInput)
+            print(System)
             if System["terminatation"] == True:
                   response = chat_prompt_gen(agent=agent, input=userInput)
                   print(response)
-                  x = chat_prompt_gen(agent=agent, input="Name This Entire Convo in one word")
-                  name = x["TTS"]
+                  x = chat_prompt_gen(agent=agent, input=" \n System :Name This Entire session with one word to save it")
+                  print(x)
+                  name = x["TTS"]["Speech"]
                   save_history(name)
                   break
             query = f"Currunt Screen: {get_current_screen()} \n User: {userInput} \n {System}"
             reply = chat_prompt_gen(agent=agent, input=query)
+            print(reply)
             if(reply.get("CMND", "").lower() != "none"):
                     CMND_response = Command_Executer(Command=reply.get("CMND"), Dangerous=reply.get("DANGER"))
                     print(CMND_response)

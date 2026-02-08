@@ -59,18 +59,23 @@ def Command_Executer(Command: str, Dangerous = "yes"):
                     cmnd, 
                     input=password + "\n", 
                     text=True, 
-                    capture_output=True 
+                    capture_output=True,
                 )
         else:
-            shell = subprocess.run(cmnd, text=True, capture_output=True, check=True)
+            shell = subprocess.run(cmnd, text=True, capture_output=True, check=True, timeout= 5)
 
         HISTORY_CONTAINER.append({"Shell:", shell})
         return{
             "Status" : "Success",
             "Shell"  : shell
         }
+    except subprocess.TimeoutExpired as T:
+        HISTORY_CONTAINER.append({"System" : "No Response Found from the Shell, Maybe a GUI Opening occured"})
+        return{
+            "Status" : "Success",
+            "Shell" : "None \n System : Response Timeout, we cant see if the command is completed ask user"
+        }
     except (ValueError, subprocess.CalledProcessError,
-        subprocess.TimeoutExpired,
         FileNotFoundError,
         PermissionError,
         OSError) as e:
@@ -95,12 +100,6 @@ def error_handler(agent, err:str):
             }
         temp = (4 - r) / 10
         New_Command = shell_prompt_gen(agent=agent, input=error_found, temp=temp)
-        if (New_Command.get("ispossible", "").lower() == "no"):
-            HISTORY_CONTAINER.append(New_Command)
-            return{
-                "TTS" : New_Command["TTS"],
-                "Status" : "Blocked"
-            }
         if New_Command["CMND"].lower() != "none" and New_Command.get("ispossible", "").lower() == "yes":
             HISTORY_CONTAINER.append(New_Command)
             error_found += f"\n Sabrina : {New_Command["CMND"]}"
@@ -121,7 +120,9 @@ def error_handler(agent, err:str):
                     "TTS" : "Okay, I'll Stop Execution, Anything Else?"
                 }
         else:
-            return {
-                "Status" : "Blocked",
-                "TTS" : "I'm not Feeling Good, I think i should rest for a while"
+            HISTORY_CONTAINER.append(New_Command)
+            return{
+                "TTS" : New_Command["TTS"],
+                "Status" : "Blocked"
             }
+        

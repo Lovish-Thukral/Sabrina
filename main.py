@@ -30,7 +30,7 @@ def main_loop():
             if System["terminatation"] == True:
                   response = chat_prompt_gen(agent=agent, input=userInput)
                   print(response)
-                  x = chat_prompt_gen(agent=agent, input=" \n System :Name This Entire session with one word to save it")
+                  x = chat_prompt_gen(agent=agent, input=" \n System :Name This Topic of Entire conversation between you and the user")
                   print(x)
                   name = x["TTS"]["Speech"]
                   save_history(name)
@@ -61,5 +61,4 @@ def main_loop():
                          if Error_Status == "Success":
                                x = chat_prompt_gen(agent=agent, input=f"System: Execution Success, ask next action \n Shell: {debug["Shell"]}")
                                continue
-
 main_loop()

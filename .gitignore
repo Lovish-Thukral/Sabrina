@@ -5,3 +5,4 @@ __pycache__/
 ConversationHistory
 temp.py
 .env
+UserPrefrences/userMataData.json

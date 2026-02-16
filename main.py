@@ -15,7 +15,7 @@ agent = Llama(
     model_path=MODEL_PATH,
     n_ctx=8192,
     n_threads=8,
-    n_gpu_layers=28,
+    n_gpu_layers=35,
     temperature=0.1,
     verbose=False
 )

@@ -1,8 +1,9 @@
 venv
-models/Qwen
+models/
 __pycache__/
 *.pyc
 ConversationHistory
 temp.py
 .env
 UserPrefrences/userMataData.json
+newvenv

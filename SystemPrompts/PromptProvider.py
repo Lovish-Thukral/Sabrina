@@ -77,8 +77,6 @@ def system_prompt(isboot = False) -> str:
         task = f"<No Command, just TTS> Greet user GM/GN for date {datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} and ask about his/her day, don't mention time."
     else:
         task = "<No Command, just TTS>  user said Hi!"
-
-    print(task)
     return f"""
 <|im_start|>system
 {SYSTEM_PROMPT_TEXT}

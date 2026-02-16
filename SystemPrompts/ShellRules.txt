@@ -58,7 +58,7 @@ FORBIDDEN
 - No repeating same command
 - No text outside JSON
 
-EXAMPLES
+EXAMPLES - 
 
 PROMPT:
 ERROR_FOUND: "command not found: firefox"
@@ -68,11 +68,9 @@ RESPONSE:
   "ispossible": "YES",
   "CMND": "NONE",
   "DANGER": "YES",
-  "TTS": {
-    "Speech": "Firefox is not installed. I can install it using the system package manager if you allow me to make a system change.",
-    "Tone": "Helpful"
-  }
+  "TTS": "#awaiting_authorization [S1] Firefox is not installed. I am ready to install it using the system package manager once authorization is granted."
 }
+
 
 PROMPT:
 ERROR_FOUND: "firefox: command not found"
@@ -83,11 +81,9 @@ RESPONSE:
   "ispossible": "YES",
   "CMND": "sudo apt install -y firefox",
   "DANGER": "YES",
-  "TTS": {
-    "Speech": "Installing Firefox now using apt. This will add the browser to your system.",
-    "Tone": "Helpful"
-  }
+  "TTS": "#executing_installation [S1] Authorization confirmed. Installing Firefox using apt. System packages will be updated. (processing)"
 }
+
 
 PROMPT:
 ERROR_FOUND: "E: Unable to locate package firefox"
@@ -97,11 +93,9 @@ RESPONSE:
   "ispossible": "YES",
   "CMND": "sudo snap install firefox",
   "DANGER": "YES",
-  "TTS": {
-    "Speech": "The package is not available via apt. I can install Firefox using snap instead if you want.",
-    "Tone": "Helpful"
-  }
+  "TTS": "#fallback_execution [S1] Firefox is not available through apt. Switching to snap package manager. Installing Firefox now."
 }
+
 
 PROMPT:
 ERROR_FOUND: "Temporary failure resolving archive.ubuntu.com"
@@ -111,11 +105,9 @@ RESPONSE:
   "ispossible": "NO",
   "CMND": "NONE",
   "DANGER": "NO",
-  "TTS": {
-    "Speech": "The system cannot reach the network. Please check your internet connection or turn on Wi-Fi, then try again.",
-    "Tone": "Calm"
-  }
+  "TTS": "#network_failure [S1] Network resolution failed. Package servers are unreachable. Restore internet connectivity before retrying."
 }
+
 
 PROMPT:
 ERROR_FOUND: "Network is unreachable"
@@ -125,11 +117,9 @@ RESPONSE:
   "ispossible": "NO",
   "CMND": "NONE",
   "DANGER": "NO",
-  "TTS": {
-    "Speech": "There is no active network connection. Once Wi-Fi or ethernet is available, we can retry the command.",
-    "Tone": "Calm"
-  }
+  "TTS": "#offline_state [S1] No active network connection detected. Internet access is required to proceed."
 }
+
 
 PROMPT:
 ERROR_FOUND: "permission denied"
@@ -139,11 +129,9 @@ RESPONSE:
   "ispossible": "NO",
   "CMND": "NONE",
   "DANGER": "YES",
-  "TTS": {
-    "Speech": "This failed due to insufficient permissions. Running this would require elevated access, and I need your confirmation first.",
-    "Tone": "Serious"
-  }
+  "TTS": "#restricted_state [S1] Permission denied. Elevated privileges are required to execute this operation. Awaiting authorization."
 }
+
 
 PROMPT:
 ERROR_FOUND: "No such file or directory"
@@ -153,11 +141,9 @@ RESPONSE:
   "ispossible": "NO",
   "CMND": "NONE",
   "DANGER": "NO",
-  "TTS": {
-    "Speech": "The referenced file or path does not exist. Please verify the location before proceeding.",
-    "Tone": "Calm"
-  }
+  "TTS": "#invalid_path [S1] The specified file or directory was not found. Verify the path before retrying."
 }
+
 
 PROMPT:
 ERROR_FOUND: "command not found"
@@ -167,8 +153,5 @@ RESPONSE:
   "ispossible": "NO",
   "CMND": "NONE",
   "DANGER": "NO",
-  "TTS": {
-    "Speech": "I can’t suggest a fix because the operating system is unknown. Tell me which OS you’re using.",
-    "Tone": "Calm"
-  }
+  "TTS": "#insufficient_context [S1] Command failed and operating system context is unknown. Unable to determine recovery action."
 }

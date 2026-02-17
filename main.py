@@ -15,7 +15,7 @@ agent = Llama(
     model_path=MODEL_PATH,
     n_ctx=8192,
     n_threads=8,
-    n_gpu_layers=35,
+    n_gpu_layers=28,
     temperature=0.1,
     verbose=False
 )
@@ -30,10 +30,7 @@ def main_loop():
             if System["terminatation"] == True:
                   response = chat_prompt_gen(agent=agent, input=userInput)
                   print(response)
-                  x = chat_prompt_gen(agent=agent, input=" \n System :Name This Topic of Entire conversation between you and the user")
-                  print(x)
-                  name = x["TTS"]["Speech"]
-                  save_history(name)
+                  save_history()
                   break
             query = f"Currunt Screen: {get_current_screen()} \n User: {userInput} \n {System}"
             reply = chat_prompt_gen(agent=agent, input=query)

@@ -1,5 +1,6 @@
 import json
 import os
+import datetime
 
 MAX_MESSAGES = 20
 MESSAGES = []
@@ -13,15 +14,15 @@ def add_message(role,content):
     MESSAGES.append({"role" : role, "content" : prompt})
     HISTORY_CONTAINER.append({"role" : role, "content" : prompt})
 
-def save_history(filename):
+def save_history():
     """
     Saves the Chat into a JSON File
     
     :param filename: Name for the file (preferred to use llm for naming)
     :type filename: str
     """
-    if(len(MESSAGES) > 2) :
-        path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{filename}.txt"
+    if(len(MESSAGES) > 4) :
+        path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{datetime.datetime.now().strip()}.txt"
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as f:
             json.dump(HISTORY_CONTAINER, f, indent=4)

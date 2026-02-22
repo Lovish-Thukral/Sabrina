@@ -1,17 +1,45 @@
+from neutts import NeuTTS
+import os
 from pathlib import Path
 import json
-def encode_Saver(audio, Character, Script, model):
-    ParentPath = Path(__file__).parent.parent.absolute()
-    filepath = ParentPath / "CoreTTS" / "Samples" / "codec.json"
-    if not Path.exists(filepath):
-        raise FileNotFoundError(f"Can't Find {filepath}")
-    with open(filepath, "r") as f:
-        prevData = json.load(f)
-    audio_codec = model.encode_reference(audio)
-    prevData[Character.strip()] = {"Script": Script.strip(), "Audio": audio_codec.tolist()}
-    with open(filepath, "w") as f:
-        json.dump(prevData, f, indent=4)  
+
+def codecSaver(audioPath : str, Script : str, Character : str):
+    tts = NeuTTS(
+        backbone_repo="/home/nullbyte/Desktop/Sabrina/models/neutts/neutss-air-BF16.gguf",
+        backbone_device="gpu",
+        language="en-us",
+        codec_repo="neuphonic/neucodec",
+        codec_device="cpu"
+    )
+
+    CurrentPath = Path(__file__).parent.parent.absolute()
+
+    if not os.path.isfile(audioPath):
+        raise FileExistsError("Given Audio Path Does'nt Exists")
+    
+    codecPath = f"{CurrentPath}/CoreTTS/Samples/codec.json"
+    with open(codecPath, mode="r") as f:
+        data = json.load(f)
+    
+    if not data:
+        data = {}
+
+    audio = tts.encode_reference(audioPath)
+    data[Character] = {
+        "Script" : Script, 
+        "Audio": audio.tolist()
+    }
+
+    tempPath = f"{CurrentPath}/CoreTTS/Samples/temp.json"
+    with open(tempPath, mode="w") as f:
+        json.dump(data, f, indent=4)
+    
+    os.replace(tempPath, codecPath)
+    tts.backbone.close()
+    return f"Cloning Codec Saved for {Character}"
+
 if __name__ == "__main__":
-    encode_Saver("test", "test", "test text")
-    
-    
+    path = "/home/nullbyte/Desktop/Sabrina/CoreTTS/Samples/lily.mp3"
+    script = "Wait… did you hear that? No, listen carefully. It’s fine, don’t worry. Things are under control now. Stay alert, and let’s continue"
+    Character = "Lily"
+    print(codecSaver(audioPath=path, Script=script, Character=Character))

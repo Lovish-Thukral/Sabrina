@@ -39,7 +39,7 @@ def codecSaver(audioPath : str, Script : str, Character : str):
     return f"Cloning Codec Saved for {Character}"
 
 if __name__ == "__main__":
-    path = "/home/nullbyte/Desktop/Sabrina/CoreTTS/Samples/lily.mp3"
+    path = "/home/nullbyte/Desktop/Sabrina/CoreTTS/Samples/nitin.mp3"
     script = "Wait… did you hear that? No, listen carefully. It’s fine, don’t worry. Things are under control now. Stay alert, and let’s continue"
-    Character = "Lily"
+    Character = "Nitin"
     print(codecSaver(audioPath=path, Script=script, Character=Character))

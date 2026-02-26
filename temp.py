@@ -21,7 +21,7 @@ with open("CoreTTS/Samples/codec.json", "r") as f:
 ref_codes = np.array(codec_data["Lily"]["Audio"], dtype=np.int32)
 ref_text = codec_data["Lily"]["Script"]
 
-samplerate = 22000
+samplerate = 24000
 
 # Queue for streaming audio chunks
 audio_queue = queue.Queue(maxsize=20)
@@ -35,7 +35,7 @@ buffer_chunks = []
 # Generator thread (producer)
 def generate_audio():
     audio_stream = tts._infer_stream_ggml(
-        input_text="Good evening, Lovish! It's February twenty-second, 2026. How's your day going so far? I'm feeling quite well, thank you! What about you?",
+        input_text="Hasumaaah",
         ref_codes=ref_codes,
         ref_text=ref_text
     )
@@ -65,19 +65,15 @@ def play_audio():
     )
 
     stream.start()
-    x = 0
     while True:
         chunk = audio_queue.get()
 
         if chunk is None:
             break
-        print(chunk)
-        x += 1
         stream.write(chunk)
 
     stream.stop()
     stream.close()
-    print(x)
 
 
 # Run threads

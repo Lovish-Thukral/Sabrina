@@ -5,6 +5,7 @@ from Core.CMND_Handler import Command_Executer, error_handler
 from helpers.MessagesContainer import HISTORY_CONTAINER
 from Tools.main import prompt_Analyzer
 from helpers.Screen_Operation import get_current_screen
+from CoreTTS.main import TTSModel
 
 # ------------------------
 # init model
@@ -14,15 +15,17 @@ MODEL_PATH = "./models/Qwen/qwen2.5-coder-7b-instruct-q5_k_m.gguf"
 agent = Llama(
     model_path=MODEL_PATH,
     n_ctx=8192,
-    n_threads=8,
+    n_threads=4,
     n_gpu_layers=28,
     temperature=0.1,
     verbose=False
 )
-
+tts = TTSModel()
 def main_loop():
       res = system_promp_gen(agent=agent, isboot=True)
+      tts.start()
       print(res)
+      tts.play(res.get("TTS", "Hello There"))
       while True:
             userInput = input("User : ").strip()
             System = prompt_Analyzer(agent=agent, input=userInput)

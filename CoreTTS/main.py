@@ -9,7 +9,7 @@ class TTSModel:
     """Persistent NeuTTS text-to-speech engine with streaming playback."""
     def __init__(
         self,
-        modelPath="models/neutts/neutss-air-BF16.gguf",
+        modelPath="models/neutts/neutts-air-Q4_0.gguf",
         decoderPath="neuphonic/neucodec-onnx-decoder-int8"
     ):
         self.modelPath = modelPath

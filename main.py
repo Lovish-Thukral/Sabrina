@@ -10,17 +10,17 @@ from CoreTTS.main import TTSModel
 # ------------------------
 # init model
 # ------------------------
+tts = TTSModel()
 
-MODEL_PATH = "./models/Qwen/qwen2.5-coder-7b-instruct-q5_k_m.gguf"
+MODEL_PATH = "/home/nullbyte/Desktop/Sabrina/models/Qwen/qwen2.5-coder-3b-instruct-q4_k_m.gguf"
 agent = Llama(
     model_path=MODEL_PATH,
-    n_ctx=8192,
+    n_ctx=4096,
     n_threads=4,
     n_gpu_layers=28,
     temperature=0.1,
     verbose=False
 )
-tts = TTSModel()
 def main_loop():
       res = system_promp_gen(agent=agent, isboot=True)
       tts.start()
@@ -29,15 +29,16 @@ def main_loop():
       while True:
             userInput = input("User : ").strip()
             System = prompt_Analyzer(agent=agent, input=userInput)
-            print(System)
             if System["terminatation"] == True:
                   response = chat_prompt_gen(agent=agent, input=userInput)
+                  tts.play(response.get("TTS"))
                   print(response)
                   save_history()
                   break
             query = f"Currunt Screen: {get_current_screen()} \n User: {userInput} \n {System}"
             reply = chat_prompt_gen(agent=agent, input=query)
             print(reply)
+            tts.play(reply.get("TTS"))
             if(reply.get("CMND", "").lower() != "none"):
                     CMND_response = Command_Executer(Command=reply.get("CMND"), Dangerous=reply.get("DANGER"))
                     print(CMND_response)

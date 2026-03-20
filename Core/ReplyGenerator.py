@@ -1,6 +1,6 @@
-from SystemPrompts.PromptProvider import chat_prompt, shell_prompt
+from Prompts.PromptProvider import chat_prompt, shell_prompt
 from helpers.MessagesContainer import add_message
-from SystemPrompts.PromptProvider import system_prompt
+from Prompts.PromptProvider import system_prompt
 from helpers.PromptConverter import JSON_maker
 
 def chat_prompt_gen(agent, input: str):

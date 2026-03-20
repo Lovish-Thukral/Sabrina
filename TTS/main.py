@@ -23,7 +23,7 @@ class TTSModel:
         "Loads The Model To Memory, Must Be Called before play()"
         self.running = True
         self.model = NeuTTS(
-            backbone_device="cpu",
+            backbone_device="gpu",
             backbone_repo=self.modelPath,
             language="en-us",
             codec_repo=self.decoderPath,

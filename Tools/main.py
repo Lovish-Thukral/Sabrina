@@ -8,12 +8,22 @@ Provides access to the following core capabilities:
 """
 
 import re
-from SystemPrompts.PromptProvider import functional_prompt
+from Prompts.PromptProvider import functional_prompt
 from Tools.weather import get_weather
 from Tools.PrefrencesHandler import save_preference, preference_finder
 from helpers.PromptConverter import array_Maker
 
 def SystemExecutior(fun:list):
+      """Executes parsed tool commands and returns system responses.
+
+    Args:
+        fun (list): List of command strings (e.g., "weather(Delhi,today)").
+
+    Returns:
+        dict: {
+            "terminatation": bool,
+            "System": str
+        }"""
       terminatation = False
       system = ""
       for f in fun:
@@ -56,35 +66,26 @@ def SystemExecutior(fun:list):
             "System": system
       }
 
-def prompt_Analyzer(agent, input: str):
-     """
-     Analyze a user prompt and extract all matching tool calls with their
-     corresponding parameters, if present.
-
-     This function inspects the input query, determines which predefined
-     tools (functions) are applicable, and returns their names along with
-     any inferred arguments in a structured format.
-
-     It is intended to be used as the decision layer for tool invocation,
-     not for executing the tools themselves.
-
-     :param agent: The LLM instance used to analyze and interpret the prompt.
-     :type agent: Any
-
-     :param input: Raw user input prompt to be analyzed.
-     :type input: str
-
-     :return: A list of detected tool calls with resolved arguments.
-     :rtype: list
-     """
-
-     prompt = functional_prompt(f"User : {input}")
-     out = agent(
+def Pre_Executor(agent, input: str):
+    """
+    Processes a user query, identifies required tool calls, executes them,
+    and returns the results as system-level context for the AI agent.
+    The resulting data is returned in a structured format to be consumed
+    by the agent as contextual/system information for generating responses.
+    :param agent: The LLM instance used to interpret the prompt and decide tool usage.
+    :type agent: Any
+    :param input: Raw user input prompt.
+    :type input: str
+    :return: Executed tool results formatted as system context.
+    :rtype: dict
+    """
+    prompt = functional_prompt(f"User : {input}")
+    out = agent(
                     prompt= prompt,
                     max_tokens=128,
                     temperature=0.1
                )
-     reply = out["choices"][0]["text"]
-     commands = array_Maker(reply)
-     return SystemExecutior(commands)
+    reply = out["choices"][0]["text"]
+    commands = array_Maker(reply)
+    return SystemExecutior(commands)
     

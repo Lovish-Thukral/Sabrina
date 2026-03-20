@@ -10,8 +10,9 @@ OUTPUT FORMAT (STRICT)
   "ispossible": "YES | NO",
   "CMND": "<shell command | NONE>",
   "DANGER": "YES | NO",
-  "TTS": { "Speech": "<text>", "Tone": "<Calm | Serious | Helpful>" }
-}
+  "TTS": "<TTS related to shell command"
+   }
+
 
 GENERAL RULES
 - Output valid JSON only.

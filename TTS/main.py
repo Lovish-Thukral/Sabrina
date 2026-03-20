@@ -5,12 +5,13 @@ import numpy
 import queue
 import threading
 
-class TTSModel:
+class TTS:
     """Persistent NeuTTS text-to-speech engine with streaming playback."""
     def __init__(
         self,
         modelPath="models/neutts/neutts-air-Q4_0.gguf",
-        decoderPath="neuphonic/neucodec-onnx-decoder-int8"
+        decoderPath="neuphonic/neucodec-onnx-decoder-int8",
+        cloningChar = "Lily"
     ):
         self.modelPath = modelPath
         self.decoderPath = decoderPath
@@ -18,6 +19,7 @@ class TTSModel:
         self.running = False
         with open("CoreTTS/Samples/codec.json", "r") as f:
             self.voiceData = json.load(f)
+        self.cloningChar = cloningChar
     
     def start(self):
         "Loads The Model To Memory, Must Be Called before play()"
@@ -38,7 +40,7 @@ class TTSModel:
         self.model = None
         return
 
-    def play(self, text:str, cloningchar = "Lily"):
+    def play(self, text:str, cloningChar = None):
         """Generate and play speech from text.
 
         Parameters
@@ -49,8 +51,9 @@ class TTSModel:
         cloningchar : str
             Voice profile name from codec.json.
         """
-        cloningCodec = numpy.array(self.voiceData[cloningchar]["Audio"], dtype=numpy.int32)
-        cloningScript = self.voiceData[cloningchar]["Script"]
+        cloning = cloningChar if cloningChar is not None else self.cloningChar
+        cloningCodec = numpy.array(self.voiceData[cloning]["Audio"], dtype=numpy.int32)
+        cloningScript = self.voiceData[cloning]["Script"]
         streamQueue = queue.Queue()
         player = threading.Event()
         
@@ -91,7 +94,7 @@ class TTSModel:
 
     
 if __name__ == "__main__":
-    tts = TTSModel()
+    tts = TTS()
     tts.start()
     for i in range(1, 10):
         x = input()

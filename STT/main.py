@@ -17,11 +17,12 @@ class STT:
         
     ):
         """Initialize model and audio/silence parameters."""
-        self.model = Model(model)
+        self.model = None
+        self.model_path = model
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
         self.max_duration = max_duration
-        self.recorder = KaldiRecognizer(self.model, 16000)
+        self.recorder = None
 
     def _get_rms(self, indata: bytes) -> float:
         """Compute RMS amplitude from raw audio buffer."""
@@ -76,6 +77,12 @@ class STT:
             result_text = json.loads(recorder.FinalResult()).get("text", "")
 
         return result_text
+
+    def start(self):
+        "Starts the STT"
+        self.model = Model(self.model_path)
+        self.recorder = KaldiRecognizer(self.model, 16000)
+        return
 
     def stop(self):
         "Stops the STT"

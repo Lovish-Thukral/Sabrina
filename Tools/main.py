@@ -56,11 +56,11 @@ def SystemExecutior(fun:list):
                   case "save_preference":
                         name, _ , val = key.partition(",")
                         response = save_preference(name, val)
-                        system += f"Save_Prefrence : \n system: {response}"
-                  case "prefrence":
+                        system += f"Save_Preference : \n system: {response}"
+                  case "preference":
                         keywords = array_Maker(key)
                         data = preference_finder(keywords)
-                        system += f"prefrence_finder: \n system:{data}"                  
+                        system += f"preference_finder: \n system:{data}"                  
       return {
             "terminate": terminatation,
             "System": system
@@ -87,5 +87,7 @@ def Pre_Executor(agent, input: str):
                )
     reply = out["choices"][0]["text"]
     commands = array_Maker(reply)
+    print(f"Identified Commands: {commands}")
     return SystemExecutior(commands)
     
+

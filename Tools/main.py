@@ -62,7 +62,7 @@ def SystemExecutior(fun:list):
                         data = preference_finder(keywords)
                         system += f"prefrence_finder: \n system:{data}"                  
       return {
-            "terminatation": terminatation,
+            "terminate": terminatation,
             "System": system
       }
 

@@ -22,7 +22,7 @@ def save_history():
     :type filename: str
     """
     if(len(MESSAGES) > 4) :
-        path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{datetime.datetime.now().strip()}.txt"
+        path = f"/home/nullbyte/Desktop/Sabrina/ConversationHistory/{str(datetime.datetime.now())}.txt"
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as f:
             json.dump(HISTORY_CONTAINER, f, indent=4)

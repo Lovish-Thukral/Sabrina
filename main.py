@@ -64,8 +64,8 @@ class Sabrina:
     
     def run(self):
         "Runs the Application"
+        self.tts.start()
         while True:
-            self.tts.start()
             input_data = self.stt.listen()
             response = self.responsed(input_data)
             print(f"Response: {response['response']['TTS']}")
@@ -73,11 +73,10 @@ class Sabrina:
             command = response["response"]["CMND"]
             if command != "NONE":
                 self.execute(command, Sudo=False)
-            else:
-                self.tts.play(response["response"]["TTS"])
-            save_history()
-            if response["System"]["terminatesession"] == True:
+            print(response["System"])
+            if response["System"]["terminate"] == True:
                 break
+        save_history()
 
     def stop(self):
         "Stops the Application"

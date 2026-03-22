@@ -20,14 +20,12 @@ def preference_finder(keys: list) -> str:
         user_metadata = json.load(f)
 
     preferences = user_metadata.get("preferences", {})
-    print(preferences)
 
     if not preferences:
         return "No Related Prefrence Found in database"
         
     for key in keys:
         value = preferences.get(key)
-        print(key)
         if value:
             return f"found {value} as {key} from database"
             

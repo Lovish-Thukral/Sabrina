@@ -87,7 +87,6 @@ def Pre_Executor(agent, input: str):
                )
     reply = out["choices"][0]["text"]
     commands = array_Maker(reply)
-    print(f"Identified Commands: {commands}")
     return SystemExecutior(commands)
     
 

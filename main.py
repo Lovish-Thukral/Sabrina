@@ -25,15 +25,15 @@ class Sabrina:
     def responsed(self, inputData):
         "Creates Response for the User Input"
         if not inputData:
-            raise ValueError("No input provided")
+            inputData = "Ask User to Repeat the Command, as No Input Detected"
         try:
-            print(f"User Input: {inputData}")
+            print(f"Received User Input: {inputData}")  # Debug statement to check input
             System = Pre_Executor(agent=self.agent, input=inputData)
             currunt_screen = get_current_screen()
             prompt = f"Currunt Screen: {currunt_screen} \n User: {inputData} \n System:{System}"
-            print(f"Generated Prompt: {prompt}")
             response = chat_prompt_gen(agent=self.agent, input=prompt)
-            print(f"Generated Response: {response}")
+            print(f"Generated Response: {response}")  # Debug statement to check response
+            self.tts.play(response["TTS"])
             return {
                 "response": response,
                 "System": System
@@ -65,16 +65,14 @@ class Sabrina:
     def run(self):
         "Runs the Application"
         self.tts.start()
-        # self.stt.start()
+        self.stt.start()
         while True:
-            # input_data = self.stt.listen()
-            input_data = input("You: ")
+            input_data = self.stt.listen()
             response = self.responsed(input_data)
-            self.tts.play(response["response"]["TTS"])
             command = response["response"]["CMND"]
             if command != "NONE":
-                self.execute(command)
-            print(response["System"])
+                shell = self.execute(command)
+                response = self.responsed(f"System: Execution Completed \n Result: {shell}")
             if response["System"]["terminate"] == True:
                 break
         save_history()

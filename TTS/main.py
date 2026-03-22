@@ -17,7 +17,7 @@ class TTS:
         self.decoderPath = decoderPath
         self.model = None
         self.running = False
-        with open("CoreTTS/Samples/codec.json", "r") as f:
+        with open("TTS/Samples/codec.json", "r") as f:
             self.voiceData = json.load(f)
         self.cloningChar = cloningChar
     

@@ -1,12 +1,10 @@
 from llama_cpp import Llama
 from helpers import save_history, HISTORY_CONTAINER, get_current_screen
 from Core import chat_prompt_gen, system_promp_gen, Command_Executer, error_handler
-from Tools import prompt_Analyzer
+from Tools import Pre_Executor
 from STT import STT
 from TTS import TTS
 from pathlib import Path
-
-
 
 
 class Sabrina:
@@ -29,10 +27,13 @@ class Sabrina:
         if not inputData:
             raise ValueError("No input provided")
         try:
-            System = prompt_Analyzer(agent=self.agent, input=inputData)
+            print(f"User Input: {inputData}")
+            System = Pre_Executor(agent=self.agent, input=inputData)
             currunt_screen = get_current_screen()
             prompt = f"Currunt Screen: {currunt_screen} \n User: {inputData} \n {System.get('System', '')}"
+            print(f"Generated Prompt: {prompt}")
             response = chat_prompt_gen(agent=self.agent, input=prompt)
+            print(f"Generated Response: {response}")
             return {
                 "response": response,
                 "System": System
@@ -61,6 +62,32 @@ class Sabrina:
             return debug_response
         return response
     
+    def run(self):
+        "Runs the Application"
+        while True:
+            self.tts.start()
+            input_data = self.stt.listen()
+            response = self.responsed(input_data)
+            print(f"Response: {response['response']['TTS']}")
+            self.tts.play(response["response"]["TTS"])
+            command = response["response"]["CMND"]
+            if command != "NONE":
+                self.execute(command, Sudo=False)
+            else:
+                self.tts.play(response["response"]["TTS"])
+            save_history()
+            if response["System"]["terminatesession"] == True:
+                break
 
+    def stop(self):
+        "Stops the Application"
+        self.tts.stop()
+        self.stt.stop()
+        self.agent = None
+        return
 
     
+if __name__ == "__main__":
+    sabrina = Sabrina()
+    sabrina.run()
+    sabrina.stop()

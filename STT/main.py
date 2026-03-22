@@ -14,12 +14,14 @@ class STT:
         silence_threshold=500,
         silence_duration=2.0,
         max_duration=30.0,
+        
     ):
         """Initialize model and audio/silence parameters."""
         self.model = Model(model)
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
         self.max_duration = max_duration
+        self.recorder = KaldiRecognizer(self.model, 16000)
 
     def _get_rms(self, indata: bytes) -> float:
         """Compute RMS amplitude from raw audio buffer."""
@@ -29,11 +31,11 @@ class STT:
     def listen(self) -> str:
         """Capture audio, stop on silence or timeout, and return recognized text."""
         result_text = ""
-        recorder = KaldiRecognizer(self.model, 16000)
+        recorder = self.recorder
         stop_event = threading.Event()
         silence_clock = [None]
 
-        def callback(indata):
+        def callback(indata, frames, time, status):
             nonlocal result_text
             rms = self._get_rms(indata)
 
@@ -75,8 +77,14 @@ class STT:
 
         return result_text
 
+    def stop(self):
+        "Stops the STT"
+        self.model = None
+        self.recorder = None
+        return
 
 if __name__ == "__main__":
     stt = STT()
     text = stt.listen()
     print(f"Recognized: {text}")
+    stt.stop()

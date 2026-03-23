@@ -1,4 +1,4 @@
-from vosk import Model, KaldiRecognizer
+from vosk import Model, KaldiRecognizer, SetLogLevel
 import sounddevice as sd
 import numpy as np
 import json
@@ -11,9 +11,9 @@ class STT:
     def __init__(
         self,
         model="/home/nullbyte/Desktop/SabrinaAI/Sabrina/models/Vosk/vosk-model-en-in-0.5",
-        silence_threshold=500,
-        silence_duration=2.0,
-        max_duration=30.0,
+        silence_threshold=2200,
+        silence_duration=1.0,
+        max_duration=20.0,
         
     ):
         """Initialize model and audio/silence parameters."""
@@ -80,6 +80,7 @@ class STT:
 
     def start(self):
         "Starts the STT"
+        SetLogLevel(-1)  # Suppress Vosk logs
         self.model = Model(self.model_path)
         self.recorder = KaldiRecognizer(self.model, 16000)
         return
@@ -92,6 +93,7 @@ class STT:
 
 if __name__ == "__main__":
     stt = STT()
+    stt.start()
     text = stt.listen()
     print(f"Recognized: {text}")
     stt.stop()

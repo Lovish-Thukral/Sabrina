@@ -220,7 +220,7 @@ def Command_Executer(Command: str) -> dict:
             return _result("Failed", str(e))
         except subprocess.TimeoutExpired:
             return _result(
-                "Failed",
+                "Success",
                 "Command timed out after 60 seconds. It may still be running in the background."
             )
         except (ValueError, PermissionError, OSError) as e:
@@ -238,8 +238,8 @@ def Command_Executer(Command: str) -> dict:
         proc = subprocess.run(tokens, text=True, capture_output=True, timeout=5)
     except subprocess.TimeoutExpired:
         return _result(
-            "Failed",
-            "Command timed out after 5 seconds. It may still be running in the background."
+            "Success",
+            "Command timed out after 5 seconds. if its an app opening its opened, if something else, its running in the background."
         )
     except FileNotFoundError:
         return _result("Failed", f"Command not found: '{tokens[0]}'. Is it installed and on PATH?")

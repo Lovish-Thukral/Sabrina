@@ -1,6 +1,6 @@
 from llama_cpp import Llama
 from helpers import save_history, HISTORY_CONTAINER, get_current_screen
-from Core import chat_prompt_gen, system_promp_gen, Command_Executer, error_handler
+from Core import chat_prompt_gen, Command_Executer, error_handler
 from Tools import Pre_Executor
 from STT import STT
 from TTS import TTS
@@ -32,7 +32,7 @@ class Sabrina:
             currunt_screen = get_current_screen()
             prompt = f"Currunt Screen: {currunt_screen} \n User: {inputData} \n System:{System}"
             response = chat_prompt_gen(agent=self.agent, input=prompt)
-            print(f"Generated Response: {response}")  # Debug statement to check response
+            print(response["TTS"])
             self.tts.play(response["TTS"])
             return {
                 "response": response,
@@ -55,7 +55,7 @@ class Sabrina:
                 "response": "No command provided"
             }
         response = Command_Executer(Command=command)
-        HISTORY_CONTAINER.append({"Shell:", response})
+        HISTORY_CONTAINER.append({"Shell Status:" : response["Status"], "Shell Response": response["Response"]})
         if response["Status"] == "Failed":
             error_info = f"Command: {command} \n Error_Found: {response.get('Error_Found', 'No error info')}"
             debug_response = error_handler(agent=self.agent, err=error_info, STT=self.stt, TTS=self.tts)
@@ -69,6 +69,7 @@ class Sabrina:
         while True:
             input_data = self.stt.listen()
             response = self.responsed(input_data)
+            print(f"Generated Response: {response}")  # Debug statement to check response
             command = response["response"]["CMND"]
             if command != "NONE":
                 shell = self.execute(command)

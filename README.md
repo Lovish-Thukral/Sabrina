@@ -1,84 +1,89 @@
-# 🤖 SABRINA
+# Sabrina AI
 
-**SABRINA** is a local, wake-word–activated AI assistant that understands user commands and performs real system-level actions.
+```{=html}
+<p align="center">
+```
+`<img width="300" src="https://res.cloudinary.com/dbjaxxkkf/image/upload/v1774338827/sabrinaAI_h6iprh.png">`{=html}`<br>`{=html}
+```{=html}
+</p>
+```
+```{=html}
+<p align="center">
+```
+`<a href="https://github.com/Lovish-Thukral/Sabrina/stargazers">`{=html}
+`<img src="https://img.shields.io/github/stars/Lovish-Thukral/Sabrina?style=for-the-badge"/>`{=html}
+`</a>`{=html} `<a href="LICENSE">`{=html}
+`<img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge"/>`{=html}
+`</a>`{=html}
+```{=html}
+</p>
+```
 
-It runs **Qwen2.5-Coder-Instruct 7B** locally using **llama.cpp**, with **Python** handling decision logic and system automation.
+------------------------------------------------------------------------
 
-No cloud. No telemetry. Just compute.
+## Overview
 
----
+Sabrina AI is a local voice-based assistant for Linux that listens,
+processes, responds, and executes commands directly on your system.
 
-## 🧠 What It Does
+------------------------------------------------------------------------
 
-- Listens for a **wake word** before activating
-- Understands **natural language commands**
-- Decides whether to:
-  - Answer a query, or
-  - Execute a system function
-- Performs controlled OS-level operations via Python
+## Workflow
 
----
+1.  Speech → Vosk (STT)
+2.  Text → LLM processing
+3.  Response → NeuTTS (TTS)
+4.  Execution → Terminal actions
 
-## ⚙️ Tech Stack
+------------------------------------------------------------------------
 
-- **LLM**: Qwen2.5-Coder-Instruct 7B  
-- **Inference**: llama.cpp  
-- **Language**: Python  
-- **Mode**: Local, offline, system-aware agent
+## Features
 
----
+-   Offline speech recognition
+-   Local LLM support
+-   Voice responses
+-   Terminal command execution
+-   Fully local and private
 
-## 🖥 System Requirements
+------------------------------------------------------------------------
 
-- **GPU**: Minimum **4 GB VRAM** (recommended for usable inference speed)
-- **CPU**: Modern x86_64 processor
-- **RAM**: 8 GB or more
-- **OS**: Linux (primary target)
+## Quickstart
 
-> CPU-only execution is technically possible but not practical.
+### Clone
 
----
+``` bash
+git clone https://github.com/Lovish-Thukral/Sabrina.git
+cd Sabrina
+```
 
-## 🚀 Current Features
+### Setup
 
-- Wake-word activation  
-- Natural language query handling  
-- System operations:
-  - Open applications
-  - Install and update packages
-  - Manage apps
-  - Shutdown system
+``` bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirement.txt
+```
 
-All actions are executed through predefined Python functions, not raw LLM shell access.
+### Model Setup
 
----
+Download model from HuggingFace and place in:
 
-## 🛣 Planned Features
+    models/
 
-- Web and local search
-- Weather fetching
-- Information and news summaries
-- Persistent memory and context
-- File and directory management
-- Plugin-based skill system
+### Run
 
-(Planned, not implemented yet.)
+``` bash
+python main.py
+```
 
----
+------------------------------------------------------------------------
 
-## 🧪 Status
+## Architecture
 
-Active development. Built for experimentation with local AI agents.
+User → Vosk → LLM → NeuTTS → Terminal
 
----
+------------------------------------------------------------------------
 
-## ⚠️ Disclaimer
+## License
 
-SABRINA can control parts of your system.  
-Use it only on machines you’re comfortable breaking and fixing.
-
----
-
-## 📄 License
-
-Add one when ready.
+MIT

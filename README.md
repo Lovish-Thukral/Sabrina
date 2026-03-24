@@ -54,6 +54,17 @@ No API keys. No telemetry. No internet required.
 
 ---
 
+## 💻 Minimum Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| **RAM** | 16 GB |
+| **GPU** | Dedicated GPU with at least 2 GB VRAM |
+| **OS** | Linux |
+| **Python** | 3.8+ |
+
+---
+
 ## 🚀 Quickstart
 
 ### 1. Clone the repo
@@ -71,14 +82,17 @@ source venv/bin/activate
 pip install -r requirement.txt
 ```
 
-### 3. Download a model
+### 3. Download models
 
-Download your preferred LLM from [HuggingFace](https://huggingface.co) and place it in the `models/` directory:
+**LLM:** Download your preferred model from [HuggingFace](https://huggingface.co) and place it in the `models/` directory.
+
+**Vosk (STT):** Download a Vosk speech recognition model from [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models) and place it in the `models/` directory as well.
 
 ```
 Sabrina/
 └── models/
-    └── your-model-file-here
+    ├── your-llm-model-here
+    └── vosk-model-folder-here
 ```
 
 ### 4. Run

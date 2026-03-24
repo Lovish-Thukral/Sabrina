@@ -9,10 +9,10 @@ from pathlib import Path
 
 class Sabrina:
     "Core Programme To Run The Application"
-    def __init__(self):
-        self.location = str(Path.cwd())       
+    def __init__(self, llmLocation = "models/llm/qwen2.5-coder-3b-instruct-q4_k_m.gguf"): 
+
         self.agent = Llama(
-            model_path= self.location + '/models/Qwen/qwen2.5-coder-3b-instruct-q4_k_m.gguf',
+            model_path= llmLocation,
             n_ctx=8192,
             n_threads=4,
             n_gpu_layers=28,

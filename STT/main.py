@@ -3,7 +3,7 @@ import sounddevice as sd
 import numpy as np
 import json
 import threading
-
+import os
 
 class STT:
     """Speech-to-text handler using Vosk with silence detection and timeout."""
@@ -18,7 +18,10 @@ class STT:
     ):
         """Initialize model and audio/silence parameters."""
         self.model = None
-        self.model_path = model
+        if os.path.exists(model):
+            self.model_path = model
+        else:
+            raise FileNotFoundError("Please Download and Add a Model in models/vosk folder")
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
         self.max_duration = max_duration

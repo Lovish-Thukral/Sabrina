@@ -1,89 +1,117 @@
-# Sabrina AI
-
-```{=html}
 <p align="center">
-```
-`<img width="300" src="https://res.cloudinary.com/dbjaxxkkf/image/upload/v1774338827/sabrinaAI_h6iprh.png">`{=html}`<br>`{=html}
-```{=html}
+  <img src="https://res.cloudinary.com/dbjaxxkkf/image/upload/v1774338827/sabrinaAI_h6iprh.png" width="160" alt="Sabrina AI Logo" />
 </p>
-```
-```{=html}
+
+<h1 align="center">Sabrina AI</h1>
+
 <p align="center">
-```
-`<a href="https://github.com/Lovish-Thukral/Sabrina/stargazers">`{=html}
-`<img src="https://img.shields.io/github/stars/Lovish-Thukral/Sabrina?style=for-the-badge"/>`{=html}
-`</a>`{=html} `<a href="LICENSE">`{=html}
-`<img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge"/>`{=html}
-`</a>`{=html}
-```{=html}
+  <em>A fully local, voice-based AI assistant for Linux</em>
 </p>
+
+<p align="center">
+  <a href="https://github.com/Lovish-Thukral/Sabrina/stargazers">
+    <img src="https://img.shields.io/github/stars/Lovish-Thukral/Sabrina?style=for-the-badge&color=63b3ed&labelColor=0d1117" alt="Stars"/>
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-f6e05e?style=for-the-badge&labelColor=0d1117" alt="MIT License"/>
+  </a>
+  <img src="https://img.shields.io/badge/Platform-Linux-68d391?style=for-the-badge&labelColor=0d1117" alt="Linux"/>
+  <img src="https://img.shields.io/badge/Python-3.8+-9f7aea?style=for-the-badge&labelColor=0d1117" alt="Python"/>
+</p>
+
+---
+
+## 🧠 Overview
+
+**Sabrina AI** is a fully offline, voice-based assistant for Linux that listens to your voice, processes it with a local LLM, responds with speech, and executes terminal commands — all **on your machine, with zero cloud dependency**.
+
+No API keys. No telemetry. No internet required.
+
+---
+
+## ⚡ Workflow
+
+```
+🎙️ Speech  →  👂 Vosk (STT)  →  🧠 LLM  →  🔊 NeuTTS (TTS)  →  ⚙️ Terminal
 ```
 
-------------------------------------------------------------------------
+| Step | Component | Role |
+|------|-----------|------|
+| 1 | **Vosk** | Offline speech-to-text |
+| 2 | **LLM** | Local language model processing |
+| 3 | **NeuTTS** | Text-to-speech response |
+| 4 | **Terminal** | Command execution |
 
-## Overview
+---
 
-Sabrina AI is a local voice-based assistant for Linux that listens,
-processes, responds, and executes commands directly on your system.
+## ✨ Features
 
-------------------------------------------------------------------------
+- 📴 **Offline Speech Recognition** — powered by Vosk, works without internet
+- 🧠 **Local LLM Support** — bring your own model from HuggingFace
+- 🔊 **Voice Responses** — natural speech output via NeuTTS
+- 💻 **Terminal Command Execution** — interact directly with your system
+- 🔒 **Fully Private** — your data never leaves your machine
 
-## Workflow
+---
 
-1.  Speech → Vosk (STT)
-2.  Text → LLM processing
-3.  Response → NeuTTS (TTS)
-4.  Execution → Terminal actions
+## 🚀 Quickstart
 
-------------------------------------------------------------------------
+### 1. Clone the repo
 
-## Features
-
--   Offline speech recognition
--   Local LLM support
--   Voice responses
--   Terminal command execution
--   Fully local and private
-
-------------------------------------------------------------------------
-
-## Quickstart
-
-### Clone
-
-``` bash
+```bash
 git clone https://github.com/Lovish-Thukral/Sabrina.git
 cd Sabrina
 ```
 
-### Setup
+### 2. Set up the environment
 
-``` bash
+```bash
 python -m venv venv
 source venv/bin/activate
 pip install -r requirement.txt
 ```
 
-### Model Setup
+### 3. Download a model
 
-Download model from HuggingFace and place in:
+Download your preferred LLM from [HuggingFace](https://huggingface.co) and place it in the `models/` directory:
 
-    models/
+```
+Sabrina/
+└── models/
+    └── your-model-file-here
+```
 
-### Run
+### 4. Run
 
-``` bash
+```bash
 python main.py
 ```
 
-------------------------------------------------------------------------
+---
 
-## Architecture
+## 🏗️ Architecture
 
-User → Vosk → LLM → NeuTTS → Terminal
+```
+User ──► Vosk (STT) ──► LLM ──► NeuTTS (TTS) ──► Terminal
+```
 
-------------------------------------------------------------------------
+---
 
-## License
+## 📄 License
 
-MIT
+This project is licensed under the **MIT License**.
+
+> **What does MIT mean?**
+> - ✅ Free to use, copy, modify, distribute, and even sell
+> - 📌 Only requirement: keep the original copyright notice in any copy
+> - ⚠️ No warranty — software is provided "as is"
+>
+> In short: *do almost anything you want with it, just give credit.*
+
+See the [LICENSE](LICENSE) file for full details.
+
+---
+
+<p align="center">
+  Built with ♥ by <a href="https://github.com/Lovish-Thukral">Lovish Thukral</a>
+</p>

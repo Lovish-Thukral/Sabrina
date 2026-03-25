@@ -10,7 +10,7 @@ class STT:
 
     def __init__(
         self,
-        model="/home/nullbyte/Desktop/SabrinaAI/Sabrina/models/Vosk/vosk-model-en-in-0.5",
+        model="models/vosk/vosk-model-small-en-in-0.4",
         silence_threshold=2200,
         silence_duration=1.0,
         max_duration=20.0,

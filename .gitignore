@@ -1,5 +1,6 @@
 venv
-models/
+models/llm
+models/tts
 __pycache__/
 *.pyc
 ConversationHistory

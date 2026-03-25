@@ -4,23 +4,54 @@ from Core import chat_prompt_gen, Command_Executer, error_handler
 from Tools import Pre_Executor
 from STT import STT
 from TTS import TTS
-from pathlib import Path
+import os
 
 
 class Sabrina:
-    "Core Programme To Run The Application"
-    def __init__(self, llmLocation = "models/llm/qwen2.5-coder-3b-instruct-q4_k_m.gguf"): 
+    """
+Core program to run the application.
 
-        self.agent = Llama(
-            model_path= llmLocation,
-            n_ctx=8192,
-            n_threads=4,
-            n_gpu_layers=28,
-            temperature=0.1,
-            verbose=False
-        )
-        self.tts = TTS()
-        self.stt = STT()
+Allows loading a language model from either a local path or a Hugging Face repository.
+
+Args:
+    llmLocation (str): Path to the local model file
+    llm_repo_id (str): Hugging Face repository ID
+    llm_filename (str): Model filename in the repository
+"""
+    def __init__(
+        self,
+        llmLocation="your/model/model.gguf",
+        llm_repo_id="Qwen/Qwen2.5-3B-Instruct-GGUF",
+        llm_filename="qwen2.5-3b-instruct-q6_k.gguf",
+    ):
+        self.agent = self.load_model(llmLocation, llm_repo_id, llm_filename)
+        self.tts = STT()
+        self.stt = TTS()
+
+    def load_model(self, path, repo_id, filename):
+        n_gpu_layers = -1
+        if os.path.isfile(path) and path.endswith(".gguf"):
+            return Llama(
+                model_path=path,
+                n_ctx=8192,
+                n_threads=4,
+                n_gpu_layers=n_gpu_layers,
+                temperature=0.1,
+                verbose=False
+            )
+        else:
+            try:
+                return Llama.from_pretrained(
+                    repo_id=repo_id,
+                    filename=filename,
+                    n_ctx=8192,
+                    n_threads=4,
+                    n_gpu_layers=n_gpu_layers,
+                    temperature=0.1,
+                    verbose=False
+                )
+            except Exception as e:
+                raise RuntimeError(f"Model loading failed: {e}")
     
     def responsed(self, inputData):
         "Creates Response for the User Input"

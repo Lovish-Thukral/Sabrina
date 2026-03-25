@@ -10,16 +10,12 @@ class TTS:
     """Persistent NeuTTS text-to-speech engine with streaming playback."""
     def __init__(
         self,
-        modelPath="models/neutts/neutts-air-Q4_0.gguf",
         cloningChar = "Lily"
     ):
-        self.decoderPath = "neuphonic/neucodec-onnx-decoder-int8"
+        self.decoder = "neuphonic/neucodec-onnx-decoder-int8"
         self.model = None
         self.running = False
-        if os.path.exists(modelPath):
-            self.modelPath = modelPath
-        else:
-            self.modelPath = "neuphonic/neutts-air-q4-gguf"
+        self.model = "neuphonic/neutts-air-q8-gguf"
         try:
             with open("TTS/Samples/codec.json", "r") as f:
                 self.voiceData = json.load(f)
@@ -32,9 +28,9 @@ class TTS:
         self.running = True
         self.model = NeuTTS(
             backbone_device="gpu",
-            backbone_repo=self.modelPath,
+            backbone_repo=self.model,
             language="en-us",
-            codec_repo=self.decoderPath,
+            codec_repo=self.decoder,
             codec_device="cpu"
         )
         return

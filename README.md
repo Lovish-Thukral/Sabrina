@@ -59,7 +59,6 @@ No API keys. No telemetry. No internet required.
 | Component | Requirement |
 |-----------|-------------|
 | **RAM** | 16 GB |
-| **GPU** | Dedicated GPU with at least 2 GB VRAM |
 | **OS** | Linux |
 | **Python** | 3.8+ |
 
@@ -74,26 +73,45 @@ git clone https://github.com/Lovish-Thukral/Sabrina.git
 cd Sabrina
 ```
 
-### 2. Set up the environment
+### 2. Run the setup script
+
+The setup script handles everything automatically — Python dependencies, PyTorch, llama-cpp-python (CPU or CUDA), NeuTTS, and the Vosk model download.
 
 ```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirement.txt
+chmod +x setup.sh
+./setup.sh
 ```
 
-### 3. Download models
+During setup, you'll be prompted:
+- **Do you have an NVIDIA GPU?** — enter `y` to install CUDA-accelerated `llama-cpp-python`, or `n` for CPU-only.
 
-**LLM:** Download your preferred model from [HuggingFace](https://huggingface.co) and place it in the `models/` directory.
+> ⚠️ The Vosk Indian English model (`vosk-model-en-in-0.5`) is ~1GB and will be downloaded automatically to `models/vosk/`.
 
-**Vosk (STT):** Download a Vosk speech recognition model from [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models) and place it in the `models/` directory as well.
+### 3. Models
+
+Both models are handled automatically:
+
+- **Vosk** (`vosk-model-en-in-0.5`) — downloaded by `setup.sh` to `models/vosk/`
+- **LLM** (`Qwen2.5-3B-Instruct-GGUF`) — auto-downloaded from HuggingFace on first run
+
+> 🛠️ **Want a different LLM?** Edit the defaults in `main.py`:
+> ```python
+> Sabrina(
+>     llm_repo_id="your-repo/model-name",
+>     llm_filename="your-model-file.gguf"
+> )
+> ```
+
+**Slow download for Vosk?** You can manually download a model from [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models), then unzip it directly into the `models/vosk/` folder:
 
 ```
 Sabrina/
 └── models/
-    ├── your-llm-model-here
-    └── vosk-model-folder-here
+    └── vosk/
+        └── vosk-model-en-in-0.5/  ← unzip here manually
 ```
+
+> ⚠️ **Using a different Vosk model?** If you download a different model than the default, make sure to update the model path in the STT directory's main file to point to your new model folder.
 
 ### 4. Run
 
@@ -114,15 +132,6 @@ User ──► Vosk (STT) ──► LLM ──► NeuTTS (TTS) ──► Termina
 ## 📄 License
 
 This project is licensed under the **MIT License**.
-
-> **What does MIT mean?**
-> - ✅ Free to use, copy, modify, distribute, and even sell
-> - 📌 Only requirement: keep the original copyright notice in any copy
-> - ⚠️ No warranty — software is provided "as is"
->
-> In short: *do almost anything you want with it, just give credit.*
-
-See the [LICENSE](LICENSE) file for full details.
 
 ---
 

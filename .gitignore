@@ -1,6 +1,5 @@
 venv
-models/llm
-models/tts
+models/
 __pycache__/
 *.pyc
 ConversationHistory
@@ -8,3 +7,4 @@ temp.py
 .env
 UserPrefrences/userMataData.json
 newvenv
+model.zip

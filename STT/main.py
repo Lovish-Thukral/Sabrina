@@ -10,9 +10,9 @@ class STT:
 
     def __init__(
         self,
-        model="models/vosk/vosk-model-small-en-in-0.4",
+        model="models/vosk/vosk-model-en-in-0.5",
         silence_threshold=2200,
-        silence_duration=1.0,
+        silence_duration=2.0,
         max_duration=20.0,
         
     ):

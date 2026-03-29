@@ -11,10 +11,8 @@ OS="$(uname -s 2>/dev/null || echo "Windows")"
 
 case "$OS" in
     Linux*)   PLATFORM="linux" ;;
-    Darwin*)  PLATFORM="mac" ;;
     MINGW*|MSYS*|CYGWIN*) PLATFORM="windows" ;;
     *)
-        # Fallback: check if we're on Windows via environment
         if [ -n "$WINDIR" ] || [ -n "$COMSPEC" ]; then
             PLATFORM="windows"
         else
@@ -65,6 +63,14 @@ fi
 "$PIP" install --upgrade pip --quiet
 
 # -----------------------------
+# Install System Audio Dependencies (Linux only)
+# -----------------------------
+if [ "$PLATFORM" == "linux" ]; then
+    echo "🎙️  Installing PortAudio system dependencies..."
+    sudo apt install -y portaudio19-dev python3-pyaudio
+fi
+
+# -----------------------------
 # Install Python dependencies
 # -----------------------------
 echo "📦 Installing Python requirements..."
@@ -78,8 +84,52 @@ read -p "💻 Do you have an NVIDIA GPU? (y/n): " gpu_choice
 gpu_choice=${gpu_choice:-n}
 
 if [[ "$gpu_choice" =~ ^[Yy]$ ]]; then
+
+    # -----------------------------
+    # Check CUDA Toolkit
+    # -----------------------------
+    if ! command -v nvcc &>/dev/null; then
+        echo ""
+        echo "⚠️  NVIDIA CUDA Toolkit not found on your system."
+        echo "    llama-cpp-python requires CUDA to be installed before continuing."
+        echo ""
+
+        if [ "$PLATFORM" == "windows" ]; then
+            echo "    👉 Download and install CUDA Toolkit for Windows:"
+            echo "       https://developer.nvidia.com/cuda-downloads"
+            echo ""
+            echo "    After installing, re-run this setup script."
+        else
+            echo "    Choose an option:"
+            echo "    [1] Install CUDA Toolkit now  (sudo apt install nvidia-cuda-toolkit)"
+            echo "    [2] Open download page        (https://developer.nvidia.com/cuda-downloads)"
+            echo ""
+            read -p "    Enter choice (1/2): " cuda_choice
+            cuda_choice=${cuda_choice:-1}
+
+            if [[ "$cuda_choice" == "1" ]]; then
+                echo "⬇️  Installing NVIDIA CUDA Toolkit..."
+                sudo apt install -y nvidia-cuda-toolkit
+                echo "✅ CUDA Toolkit installed."
+            else
+                echo ""
+                echo "    👉 Visit: https://developer.nvidia.com/cuda-downloads"
+                echo "    After installing CUDA, re-run this setup script."
+                exit 0
+            fi
+        fi
+
+        # Verify CUDA is now available
+        if ! command -v nvcc &>/dev/null; then
+            echo ""
+            echo "❌ CUDA still not detected. Please install it and re-run setup."
+            exit 1
+        fi
+    fi
+
     echo "⚡ Installing llama-cpp-python with CUDA..."
-    CMAKE_ARGS="-DGGML_CUDA=on" "$PIP" install llama-cpp-python
+    CMAKE_ARGS="-DGGML_CUDA=on" GGML_CCACHE=OFF "$PIP" install llama-cpp-python
+
 else
     echo "🐢 Installing llama-cpp-python (CPU)..."
     "$PIP" install llama-cpp-python
@@ -111,8 +161,6 @@ user_gender=${user_gender:-"Other"}
 # Detect OS pretty name
 if [ -f /etc/os-release ]; then
     user_os=$(. /etc/os-release && echo "$PRETTY_NAME")
-elif [ "$PLATFORM" == "mac" ]; then
-    user_os="macOS $(sw_vers -productVersion)"
 elif [ "$PLATFORM" == "windows" ]; then
     user_os="Windows"
 else
@@ -128,6 +176,42 @@ else
 fi
 
 # -----------------------------
+# Detect Total RAM
+# -----------------------------
+if [ "$PLATFORM" == "linux" ]; then
+    total_ram_mb=$(grep MemTotal /proc/meminfo | awk '{printf "%.2f MB\n", $2/1024}')
+    total_ram_mb=$((total_ram_kb / 1024))
+    total_ram="${total_ram_mb} MB"
+elif [ "$PLATFORM" == "windows" ]; then
+    total_ram_bytes=$(wmic ComputerSystem get TotalPhysicalMemory /value 2>/dev/null | grep = | cut -d= -f2 | tr -d '\r')
+    if [ -n "$total_ram_bytes" ]; then
+        total_ram_mb=$((total_ram_bytes / 1024 / 1024))
+        total_ram="${total_ram_mb} MB"
+    else
+        total_ram="Unknown"
+    fi
+else
+    total_ram="Unknown"
+fi
+
+# -----------------------------
+# Detect VRAM (if GPU selected)
+# -----------------------------
+vram="N/A"
+if [[ "$gpu_choice" =~ ^[Yy]$ ]]; then
+    if command -v nvidia-smi &>/dev/null; then
+        vram_mb=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null | head -n1 | tr -d ' ')
+        if [ -n "$vram_mb" ]; then
+            vram="${vram_mb} MB"
+        else
+            vram="Unknown"
+        fi
+    else
+        vram="Unknown"
+    fi
+fi
+
+# -----------------------------
 # Create User Metadata
 # -----------------------------
 METADATA_DIR="UserPreferences"
@@ -135,34 +219,34 @@ METADATA_FILE="${METADATA_DIR}/userMetaData.json"
 
 mkdir -p "$METADATA_DIR"
 
-cat > "$METADATA_FILE" <<EOF
+cat > "$METADATA_FILE" <<METAEOF
 {
     "version": "1.0",
     "user": {
         "name": "${user_name}",
         "gender": "${user_gender}",
         "user_os": "${user_os}",
-        "default_shell": "${default_shell}"
+        "default_shell": "${default_shell}",
+        "total_ram": "${total_ram}",
+        "vram": "${vram}"
     },
     "preferences": {}
 }
-EOF
+METAEOF
 
 echo "✅ User metadata saved to $METADATA_FILE"
 
 # -----------------------------
-# Final Message
+# Launch Sabrina AI
 # -----------------------------
 echo ""
-echo "🚀 Setup complete!"
+echo "🚀 Setup complete! Launching Sabrina AI..."
 echo ""
-echo "👉 Activate your virtual environment before running:"
 
 if [ "$PLATFORM" == "windows" ]; then
-    echo "   .venv\\Scripts\\activate"
+    source "$VENV_DIR/Scripts/activate"
 else
-    echo "   source .venv/bin/activate"
+    source "$VENV_DIR/bin/activate"
 fi
 
-echo ""
-echo "   Then run: python main.py"
+python main.py

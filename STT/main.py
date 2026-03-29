@@ -8,11 +8,11 @@ class STT:
     """Speech-to-text handler using Whisper v3 (local) with silence detection and timeout."""
     def __init__(
         self,
-        model_size: str = "large-v3-turbo",
+        model_size: str = "medium.en",
         device: str = "cpu",
         compute_type: str = "int8",
         language: str = "en",
-        silence_threshold: float = 300.0,
+        silence_threshold: float = 2200.0,
         silence_duration: float = 2.0,
         max_duration: float = 20.0,
         samplerate: int = 16000,
@@ -66,7 +66,7 @@ class STT:
         hard_timer = threading.Timer(self.max_duration, stop_event.set)
         hard_timer.start()
 
-        with sd.RawInputStream(samplerate=self.samplerate, blocksize=8000, dtype="int16", channels=1, callback=callback):
+        with sd.RawInputStream(samplerate=self.samplerate, blocksize=4000, dtype="int16", channels=1, callback=callback):
             stop_event.wait()
 
         hard_timer.cancel()

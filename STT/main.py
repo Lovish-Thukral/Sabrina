@@ -1,102 +1,99 @@
-from vosk import Model, KaldiRecognizer, SetLogLevel
-import sounddevice as sd
-import numpy as np
-import json
 import threading
-import os
+import numpy as np
+import sounddevice as sd
+from faster_whisper import WhisperModel
+
 
 class STT:
-    """Speech-to-text handler using Vosk with silence detection and timeout."""
-
+    """Speech-to-text handler using Whisper v3 (local) with silence detection and timeout."""
     def __init__(
         self,
-        model="models/vosk/vosk-model-en-in-0.5",
-        silence_threshold=2200,
-        silence_duration=5.0,
-        max_duration=20.0,
-        
+        model_size: str = "large-v3-turbo",
+        device: str = "cpu",
+        compute_type: str = "int8",
+        language: str = "en",
+        silence_threshold: float = 300.0,
+        silence_duration: float = 2.0,
+        max_duration: float = 20.0,
+        samplerate: int = 16000,
     ):
-        """Initialize model and audio/silence parameters."""
-        self.model = None
-        if os.path.exists(model):
-            self.model_path = model
-        else:
-            raise FileNotFoundError("Please Download and Add a Model in models/vosk folder")
+        self.model_size = model_size
+        self.device = device
+        self.compute_type = compute_type
+        self.language = language
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
         self.max_duration = max_duration
-        self.recorder = None
+        self.samplerate = samplerate
+        self._model: WhisperModel | None = None
 
-    def _get_rms(self, indata: bytes) -> float:
-        """Compute RMS amplitude from raw audio buffer."""
-        audio = np.frombuffer(bytes(indata), dtype=np.int16).astype(np.float32)
-        return float(np.sqrt(np.mean(audio ** 2)))
+    def start(self) -> None:
+        """Load the model into memory."""
+        self._model = WhisperModel(self.model_size, device=self.device, compute_type=self.compute_type)
+
+    def stop(self) -> None:
+        """Release the model from memory."""
+        self._model = None
+
+    def _rms(self, chunk: np.ndarray) -> float:
+        return float(np.sqrt(np.mean(chunk.astype(np.float32) ** 2)))
 
     def listen(self) -> str:
-        """Capture audio, stop on silence or timeout, and return recognized text."""
-        result_text = ""
-        recorder = self.recorder
+        """
+         Record audio until silence or timeout, then transcribe with Whisper.
+
+        Returns the recognised text string (may be empty if nothing was said)."""
+        if self._model is None:
+            raise RuntimeError("Call start() before listen().")
+
+        chunks: list[np.ndarray] = []
         stop_event = threading.Event()
-        silence_clock = [None]
+        silence_timer: list[threading.Timer | None] = [None]
 
-        def callback(indata, frames, time, status):
-            nonlocal result_text
-            rms = self._get_rms(indata)
+        def callback(indata, frames, time_info, status):
+            chunk = np.frombuffer(bytes(indata), dtype=np.int16).copy()
+            chunks.append(chunk)
 
-            if rms > self.silence_threshold:
-                if silence_clock[0] is not None:
-                    silence_clock[0].cancel()
-                    silence_clock[0] = None
+            if self._rms(chunk) > self.silence_threshold:
+                if silence_timer[0]:
+                    silence_timer[0].cancel()
+                    silence_timer[0] = None
             else:
-                if silence_clock[0] is None:
-                    silence_clock[0] = threading.Timer(
-                        self.silence_duration, stop_event.set
-                    )
-                    silence_clock[0].start()
-
-            if recorder.AcceptWaveform(bytes(indata)):
-                result = json.loads(recorder.Result())
-                if result.get("text"):
-                    result_text = result["text"]
+                if not silence_timer[0]:
+                    silence_timer[0] = threading.Timer(self.silence_duration, stop_event.set)
+                    silence_timer[0].start()
 
         hard_timer = threading.Timer(self.max_duration, stop_event.set)
         hard_timer.start()
 
-        print("Listening...")
-        with sd.RawInputStream(
-            samplerate=16000,
-            blocksize=8000,
-            dtype='int16',
-            channels=1,
-            callback=callback,
-        ):
+        with sd.RawInputStream(samplerate=self.samplerate, blocksize=8000, dtype="int16", channels=1, callback=callback):
             stop_event.wait()
 
         hard_timer.cancel()
-        if silence_clock[0]:
-            silence_clock[0].cancel()
+        if silence_timer[0]:
+            silence_timer[0].cancel()
 
-        if not result_text:
-            result_text = json.loads(recorder.FinalResult()).get("text", "")
+        if not chunks:
+            return ""
 
-        return result_text
+        audio = np.concatenate(chunks).astype(np.float32) / 32768.0
+        segments, _ = self._model.transcribe(
+            audio,
+            language=self.language,
+            beam_size=5,
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500),
+        )
 
-    def start(self):
-        "Starts the STT"
-        SetLogLevel(-1)  # Suppress Vosk logs
-        self.model = Model(self.model_path)
-        self.recorder = KaldiRecognizer(self.model, 16000)
-        return
+        return " ".join(seg.text.strip() for seg in segments).strip()
 
-    def stop(self):
-        "Stops the STT"
-        self.model = None
-        self.recorder = None
-        return
 
 if __name__ == "__main__":
-    stt = STT()
+    stt = STT( 
+        device="cpu",            # change to "cuda" if you have an NVIDIA GPU
+        compute_type="int8",     # "float16" recommended on GPU
+    )
     stt.start()
-    text = stt.listen()
-    print(f"Recognized: {text}")
+    recognised = stt.listen()
+    print(f"Recognised: {recognised}")
     stt.stop()

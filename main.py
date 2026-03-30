@@ -5,6 +5,54 @@ from Tools import Pre_Executor
 from STT import STT
 from TTS import TTS
 import os
+import json
+
+models = {
+    "8" : {
+            "repo" :"Qwen/Qwen2.5-7B-Instruct-GGUF",
+            "model" : "qwen2.5-7b-instruct-fp16-00001-of-00004.gguf"
+        },
+    "6" : {
+            "repo" :"Qwen/Qwen2.5-3B-Instruct-GGUF",
+            "model" : "qwen2.5-3b-instruct-q6_k.gguf"
+        },
+    "4" : {
+            "repo" : "Qwen/Qwen2.5-3B-Instruct-GGUF",
+            "model" : "qwen2.5-3b-instruct-fp16-00001-of-00002.gguf",
+        },
+    "macro_model" : {
+            "repo" : "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+            "model" : "qwen2.5-1.5b-instruct-q5_k_m.gguf",
+    }            
+}
+
+def decider():
+    "Decides which model to Load based on the System Configuration, and Returns the Model Path and Repository Information"
+    with open("UserPreferences/UserMetaData.json", "r") as f:
+        data = json.load()
+    user = data.get("user", {})
+    if not user:
+        raise ValueError("User information not found in UserMetaData.json, re-execute the install.sh. Don't Worry Nothing gonna download again")
+    gpu = user.get("vram", "N/A" )
+    if int(gpu) >= 8000:
+        return models["8"]
+    elif int(gpu) >= 6000:
+        return models["6"]
+    elif int(gpu) >= 4000:  
+        return models["4"]
+    else:
+        cpu = user.get("total_ram", "N/A")
+        if cpu == "Unknown" or cpu == "N/A":
+            raise ValueError("CPU information not found in UserMetaData.json, re-execute the install.sh. Don't Worry Nothing gonna download again")
+        elif cpu >= 15000:
+            return models["8"]
+        elif cpu >= 12000:
+            return models["6"]
+        elif cpu >= 8000:
+            return models["4"]
+        else:            
+            return models["macro_model"]
+            
 
 class Sabrina:
     """

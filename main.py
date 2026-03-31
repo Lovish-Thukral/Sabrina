@@ -7,23 +7,45 @@ from TTS import TTS
 import os
 import json
 
+import json
+
+from huggingface_hub import model_info
+
+def safe_int(value):
+    """Safely converts a value to an integer, returning None if conversion fails."""
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
 models = {
-    "8" : {
-            "repo" :"Qwen/Qwen2.5-7B-Instruct-GGUF",
-            "model" : "qwen2.5-7b-instruct-fp16-00001-of-00004.gguf"
-        },
-    "6" : {
-            "repo" :"Qwen/Qwen2.5-3B-Instruct-GGUF",
-            "model" : "qwen2.5-3b-instruct-q6_k.gguf"
-        },
-    "4" : {
-            "repo" : "Qwen/Qwen2.5-3B-Instruct-GGUF",
-            "model" : "qwen2.5-3b-instruct-fp16-00001-of-00002.gguf",
-        },
-    "macro_model" : {
-            "repo" : "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
-            "model" : "qwen2.5-1.5b-instruct-q5_k_m.gguf",
-    }            
+    "8": {
+        "repo": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+        # ~5–6 GB VRAM (Q4_K_M, split file, requires both parts)
+        "model": "qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "stt" : "medium.en"
+    },
+
+    "6": {
+        "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+        # ~3.5–4.5 GB VRAM (Q6, tighter but better quality than Q4)
+        "model": "qwen2.5-3b-instruct-q6_k.gguf",
+        "stt" : "medium.en"
+    },
+
+    "4": {
+        "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+        # ~2.5–3.5 GB VRAM (Q4_K_M, safe for 4GB GPUs)
+        "model": "qwen2.5-3b-instruct-q4_k_m.gguf",
+        "stt" : "small.en"
+    },
+
+    "macro_model": {
+        "repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+        # ~1.5–2.5 GB VRAM (Q5_K_M, fallback, very safe)
+        "model": "qwen2.5-1.5b-instruct-q5_k_m.gguf",
+        "stt" : "small.en"
+    }
 }
 
 def decider():
@@ -39,29 +61,32 @@ def decider():
 
     gpu = user.get("vram")
     cpu = user.get("total_ram")
+    model_info = None
 
     if gpu not in (None, "N/A", "Unknown"):
-        gpu = int(gpu)
+        gpu_available = True
+        gpu = safe_int(gpu)
         if gpu >= 8000:
-            return models["8"]
+            model_info =  models["8"]
         elif gpu >= 6000:
-            return models["6"]
+            model_info = models["6"]
         elif gpu >= 4000:
-            return models["4"]
+            model_info = models["4"]
     if cpu in (None, "N/A", "Unknown"):
         raise ValueError(
             "CPU information not found in UserMetaData.json, re-execute install.sh. Nothing will download again."
         )
-    cpu = int(cpu)
+    cpu = safe_int(cpu)
     if cpu >= 15000:
-        return models["8"]
+        model_info = models["6"]
     elif cpu >= 11000:
-        return models["6"]
-    elif cpu >= 8000:
-        return models["4"]
+        model_info = models["4"]
     else:
-        return models["macro_model"]
-            
+        model_info = models["macro_model"]
+    return {
+        "models": model_info,
+        "gpu": gpu_available 
+    }
 
 class Sabrina:
     """
@@ -78,9 +103,10 @@ Args:
         self,
         local_model_path="null",
     ):
-        self.model_info = decider()
+        self.device_info = decider()
+        self.model_info = self.device_info.get("models", {})
         self.agent = self.load_model(repo_id=self.model_info["repo"], filename=self.model_info["model"], localpath= local_model_path)
-        self.stt = STT()
+        self.stt = STT(model_size=self.model_info["stt"], device="cuda" if self.device_info.get("gpu", False) else "cpu")
         self.tts = TTS()
         self.noinput = 0
 

@@ -67,7 +67,7 @@ fi
 # -----------------------------
 if [ "$PLATFORM" == "linux" ]; then
     echo "🎙️  Installing PortAudio system dependencies..."
-    sudo apt install -y portaudio19-dev python3-pyaudio
+    sudo apt install -y portaudio19-dev python3-pyaudio xdotool
 fi
 
 # -----------------------------
@@ -179,14 +179,14 @@ fi
 # Detect Total RAM
 # -----------------------------
 if [ "$PLATFORM" == "linux" ]; then
-    total_ram_mb=$(grep MemTotal /proc/meminfo | awk '{printf "%.2f MB\n", $2/1024}')
+    total_ram_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
     total_ram_mb=$((total_ram_kb / 1024))
-    total_ram="${total_ram_mb} MB"
+    total_ram="${total_ram_mb}"
 elif [ "$PLATFORM" == "windows" ]; then
     total_ram_bytes=$(wmic ComputerSystem get TotalPhysicalMemory /value 2>/dev/null | grep = | cut -d= -f2 | tr -d '\r')
     if [ -n "$total_ram_bytes" ]; then
         total_ram_mb=$((total_ram_bytes / 1024 / 1024))
-        total_ram="${total_ram_mb} MB"
+        total_ram="${total_ram_mb}"
     else
         total_ram="Unknown"
     fi
@@ -202,7 +202,7 @@ if [[ "$gpu_choice" =~ ^[Yy]$ ]]; then
     if command -v nvidia-smi &>/dev/null; then
         vram_mb=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null | head -n1 | tr -d ' ')
         if [ -n "$vram_mb" ]; then
-            vram="${vram_mb} MB"
+            vram="${vram_mb}"
         else
             vram="Unknown"
         fi

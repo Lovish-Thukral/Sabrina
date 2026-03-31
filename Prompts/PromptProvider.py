@@ -11,7 +11,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 SHELL_PROMPT_PATH = PROJECT_ROOT / "Prompts" / "ShellRules.txt"
 MODEL_RULES_PATH = PROJECT_ROOT / "Prompts" / "Formatter&Rules.txt"
-USER_METADATA_PATH = PROJECT_ROOT / "UserPrefrences" / "userMataData.json"
+USER_METADATA_PATH = PROJECT_ROOT / "UserPreferences" / "userMetaData.json"
 FUNCTIONAL_ANALYSIS_PATH = PROJECT_ROOT / "Prompts" / "FunctionAnalysis.txt"
 
 # Verify files exist

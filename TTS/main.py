@@ -65,7 +65,7 @@ class TTS:
             for chunk in chunks:
                streamQueue.put(chunk)
                chunksSize += 1
-               if chunksSize == 3:
+               if chunksSize == 5:
                    player.set()
             streamQueue.put(None)
             if chunksSize < 3:

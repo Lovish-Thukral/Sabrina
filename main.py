@@ -27,31 +27,40 @@ models = {
 }
 
 def decider():
-    "Decides which model to Load based on the System Configuration, and Returns the Model Path and Repository Information"
-    with open("UserPreferences/UserMetaData.json", "r") as f:
-        data = json.load()
+    """Decides which model to load based on system config."""
+    with open("UserPreferences/userMetaData.json", "r") as f:
+        data = json.load(f)
+
     user = data.get("user", {})
     if not user:
-        raise ValueError("User information not found in UserMetaData.json, re-execute the install.sh. Don't Worry Nothing gonna download again")
-    gpu = user.get("vram", "N/A" )
-    if int(gpu) >= 8000:
+        raise ValueError(
+            "User information not found in UserMetaData.json, re-execute install.sh. Nothing will download again."
+        )
+
+    gpu = user.get("vram")
+    cpu = user.get("total_ram")
+
+    if gpu not in (None, "N/A", "Unknown"):
+        gpu = int(gpu)
+        if gpu >= 8000:
+            return models["8"]
+        elif gpu >= 6000:
+            return models["6"]
+        elif gpu >= 4000:
+            return models["4"]
+    if cpu in (None, "N/A", "Unknown"):
+        raise ValueError(
+            "CPU information not found in UserMetaData.json, re-execute install.sh. Nothing will download again."
+        )
+    cpu = int(cpu)
+    if cpu >= 15000:
         return models["8"]
-    elif int(gpu) >= 6000:
+    elif cpu >= 11000:
         return models["6"]
-    elif int(gpu) >= 4000:  
+    elif cpu >= 8000:
         return models["4"]
     else:
-        cpu = user.get("total_ram", "N/A")
-        if cpu == "Unknown" or cpu == "N/A":
-            raise ValueError("CPU information not found in UserMetaData.json, re-execute the install.sh. Don't Worry Nothing gonna download again")
-        elif cpu >= 15000:
-            return models["8"]
-        elif cpu >= 12000:
-            return models["6"]
-        elif cpu >= 8000:
-            return models["4"]
-        else:            
-            return models["macro_model"]
+        return models["macro_model"]
             
 
 class Sabrina:
@@ -67,20 +76,19 @@ Args:
 """
     def __init__(
         self,
-        llmLocation="your/model/model.gguf",
-        llm_repo_id="Qwen/Qwen2.5-3B-Instruct-GGUF",
-        llm_filename="qwen2.5-3b-instruct-q6_k.gguf",
+        local_model_path="null",
     ):
-        self.agent = self.load_model(llmLocation, llm_repo_id, llm_filename)
+        self.model_info = decider()
+        self.agent = self.load_model(repo_id=self.model_info["repo"], filename=self.model_info["model"], localpath= local_model_path)
         self.stt = STT()
         self.tts = TTS()
         self.noinput = 0
 
-    def load_model(self, path, repo_id, filename):
+    def load_model(self, localpath, repo_id, filename):
         n_gpu_layers = -1
-        if os.path.isfile(path) and path.endswith(".gguf"):
+        if localpath.endswith(".gguf") and os.path.isfile(localpath):
             return Llama(
-                model_path=path,
+                model_path=localpath,
                 n_ctx=8192,
                 n_threads=4,
                 n_gpu_layers=n_gpu_layers,
@@ -112,7 +120,7 @@ Args:
             else:
                 inputData = "Ask User to Repeat the Command, as No Input Detected"
         else:
-            self.noinput = 0  # reset when valid input comes
+            self.noinput = 0 
 
         try:
             print(f"Received User Input: {inputData}")

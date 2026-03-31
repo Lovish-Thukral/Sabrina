@@ -4,7 +4,9 @@
         "name": "Lovish",
         "gender": "Male",
         "user_os": "Ubuntu 24.04.4 LTS",
-        "default_shell": "bash"
+        "default_shell": "bash",
+        "total_ram": "15678",
+        "vram": "6144"
     },
     "preferences": {}
 }

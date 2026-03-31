@@ -5,14 +5,14 @@ from faster_whisper import WhisperModel
 
 
 class STT:
-    """Speech-to-text handler using Whisper v3 (local) with silence detection and timeout."""
+    """Speech-to-text handler with silence detection and timeout."""
     def __init__(
         self,
         model_size: str = "medium.en",
         device: str = "cpu",
         compute_type: str = "int8",
         language: str = "en",
-        silence_threshold: float = 2200.0,
+        silence_threshold: float = 2800.0,
         silence_duration: float = 2.0,
         max_duration: float = 20.0,
         samplerate: int = 16000,
@@ -90,8 +90,8 @@ class STT:
 
 if __name__ == "__main__":
     stt = STT( 
-        device="cpu",            # change to "cuda" if you have an NVIDIA GPU
-        compute_type="int8",     # "float16" recommended on GPU
+        device="cuda",            # change to "cuda" if you have an NVIDIA GPU
+        compute_type="float16",     # "float16" recommended on GPU
     )
     stt.start()
     recognised = stt.listen()

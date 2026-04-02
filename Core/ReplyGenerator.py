@@ -4,6 +4,7 @@ from Prompts.PromptProvider import system_prompt
 from helpers.PromptConverter import JSON_maker
 
 def chat_prompt_gen(agent, input: str, noinput = 0):
+     add_message(role="user", content=input)
      prompt = chat_prompt()
      out = agent(
                     prompt= prompt,
@@ -13,7 +14,6 @@ def chat_prompt_gen(agent, input: str, noinput = 0):
                )
      reply = out["choices"][0]["text"]
      if noinput != 0:
-        add_message(role="user", content=input)
         add_message(role="Sabrina", content=reply.strip())
      response = JSON_maker(reply)
      return response

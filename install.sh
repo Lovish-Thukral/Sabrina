@@ -243,10 +243,52 @@ echo ""
 echo "🚀 Setup complete! Launching Sabrina AI..."
 echo ""
 
-if [ "$PLATFORM" == "windows" ]; then
-    source "$VENV_DIR/Scripts/activate"
-else
-    source "$VENV_DIR/bin/activate"
-fi
+CURRENT_DIR="$(pwd)"
 
-python main.py
+if [ "$PLATFORM" == "windows" ]; then
+
+    # -----------------------------
+    # Create Desktop Shortcut (Windows)
+    # -----------------------------
+    echo "🖥️  Creating desktop shortcut..."
+
+    BAT_FILE="$(cygpath -w "$CURRENT_DIR/shortcutkey.bat" 2>/dev/null || echo "$CURRENT_DIR\\shortcutkey.bat")"
+    DESKTOP="$(cygpath "$USERPROFILE/Desktop" 2>/dev/null || echo "$USERPROFILE\\Desktop")"
+    LINK_FILE="$DESKTOP\\Sabrina.lnk"
+    VBS_FILE="$CURRENT_DIR\\create_shortcut.vbs"
+
+    # Prefer .ico, fall back to .png
+    if [ -f "$CURRENT_DIR/icon.ico" ]; then
+        ICO_FILE="$(cygpath -w "$CURRENT_DIR/icon.ico" 2>/dev/null || echo "$CURRENT_DIR\\icon.ico")"
+    elif [ -f "$CURRENT_DIR/icon.png" ]; then
+        ICO_FILE="$(cygpath -w "$CURRENT_DIR/icon.png" 2>/dev/null || echo "$CURRENT_DIR\\icon.png")"
+    else
+        ICO_FILE=""
+    fi
+
+    # Write the VBScript
+    cat > "$VBS_FILE" <<VBSEOF
+Set oWS = WScript.CreateObject("WScript.Shell")
+sLinkFile = "$LINK_FILE"
+Set oLink = oWS.CreateShortcut(sLinkFile)
+oLink.TargetPath = "$BAT_FILE"
+oLink.WorkingDirectory = "$(cygpath -w "$CURRENT_DIR" 2>/dev/null || echo "$CURRENT_DIR")"
+$([ -n "$ICO_FILE" ] && echo "oLink.IconLocation = \"$ICO_FILE\"")
+oLink.Save
+VBSEOF
+
+    # Run VBScript and clean up
+    cscript //nologo "$(cygpath -w "$VBS_FILE" 2>/dev/null || echo "$VBS_FILE")"
+    rm -f "$VBS_FILE"
+    echo "✅ Desktop shortcut created at: $LINK_FILE"
+
+    "$PYTHON" main.py
+
+elif [ "$PLATFORM" == "linux" ]; then
+    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \
+    "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'Launch Sabrina AI'
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command "$CURRENT_DIR/shortcutkey.sh"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Super><Shift>S'
+    ./shortcutkey.sh
+fi

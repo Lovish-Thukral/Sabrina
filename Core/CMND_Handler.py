@@ -266,9 +266,7 @@ def error_handler(agent, err: str, STT, TTS) -> dict:
         danger   = new_cmd.get("DANGER", "no").lower()
         HISTORY_CONTAINER.append(new_cmd)
         if not cmd_str or cmd_str.lower() == "none" or possible != "yes":
-            TTS.play(tts_str)
             return _result("Blocked", tts_str)
-
         if danger == "yes":
             TTS.play(tts_str)
             TTS.play(

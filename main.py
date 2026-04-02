@@ -2,14 +2,11 @@ from llama_cpp import Llama
 from helpers import save_history, HISTORY_CONTAINER, get_current_screen
 from Core import chat_prompt_gen, Command_Executer, error_handler
 from Tools import Pre_Executor
+from GUI import MainWindow
 from STT import STT
 from TTS import TTS
 import os
 import json
-
-import json
-
-from huggingface_hub import model_info
 
 def safe_int(value):
     """Safely converts a value to an integer, returning None if conversion fails."""
@@ -108,6 +105,7 @@ Args:
         self.agent = self.load_model(repo_id=self.model_info["repo"], filename=self.model_info["model"], localpath= local_model_path)
         self.stt = STT(model_size=self.model_info["stt"], device="cuda" if self.device_info.get("gpu", False) else "cpu")
         self.tts = TTS()
+        self.window = MainWindow()
         self.noinput = 0
 
     def load_model(self, localpath, repo_id, filename):
@@ -155,8 +153,9 @@ Args:
             currunt_screen = get_current_screen()
 
             prompt = f"Currunt Screen: {currunt_screen} \n User: {inputData} \n System:{System}"
+            print(prompt)
 
-            response = chat_prompt_gen(agent=self.agent, input=prompt)
+            response = chat_prompt_gen(agent=self.agent, input=prompt, noinput=self.noinput)
 
             print(response["TTS"])
             self.tts.play(response["TTS"])
@@ -193,6 +192,7 @@ Args:
     
     def run(self):
         "Runs the Application"
+        self.window.show()
         self.tts.start()
         self.stt.start()
         while True:

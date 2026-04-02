@@ -13,6 +13,40 @@ from Tools.weather import get_weather
 from Tools.PrefrencesHandler import save_preference, preference_finder
 from helpers.PromptConverter import array_Maker
 
+
+exit_phrases = [
+    # direct exits
+    "bye",
+    "goodbye",
+    "exit",
+    "quit",
+    "terminate",
+    "end session",
+    "close chat",
+    "shutdown",
+    "stop session",
+
+    # sleep-style commands
+    "go to sleep",
+    "sleep now",
+    "you can sleep",
+    "enter sleep mode",
+
+    # stronger intent (less collision)
+    "end this chat",
+    "terminate this session",
+    "close this conversation",
+    "stop this conversation",
+
+    # polite endings (less risky but still okay)
+    "see you later",
+    "talk to you later",
+    "catch you later",
+    "good night",
+    "goodnight",
+]
+
+
 def SystemExecutior(fun:list):
       """Executes parsed tool commands and returns system responses.
 
@@ -87,6 +121,8 @@ def Pre_Executor(agent, input: str):
                )
     reply = out["choices"][0]["text"]
     commands = array_Maker(reply)
+    if any(phrase in input.lower() for phrase in exit_phrases):
+         commands.append("terminatesession()")
     return SystemExecutior(commands)
     
 

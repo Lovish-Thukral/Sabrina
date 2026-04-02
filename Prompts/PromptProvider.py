@@ -58,8 +58,8 @@ def format_user_metadata(meta: dict, request: str) -> str:
 
 # Build base system prompt (raw content)
 SYSTEM_PROMPT_TEXT = "\n".join([
-    MODEL_RULES,
     format_user_metadata(USER_METADATA, "user"),
+    MODEL_RULES
 ])
 
 SHELL_PROMPT_TEXT = "\n".join([

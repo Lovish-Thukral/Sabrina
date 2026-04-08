@@ -5,6 +5,6 @@ __pycache__/
 ConversationHistory
 temp.py
 .env
-UserPrefrences/userMataData.json
+UserPreferences/
 newvenv
 model.zip

@@ -1,57 +1,77 @@
+# GUI/GUI.py
 import sys
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow,
-    QWidget, QPushButton, QVBoxLayout, QHBoxLayout
-)
-from PySide6.QtCore import Qt, QPoint
+import os
+from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import QTimer
+
+_app = None
+
+# Look for icon in root (one level up from this file)
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_ICON = None
+for _name in ("icon.ico", "icon.png"):
+    _path = os.path.join(_ROOT, _name)
+    if os.path.exists(_path):
+        _ICON = _path
+        break
+
+class MainWindow:
+    def __init__(self, stop_callback=None):
+        global _app
+        if QApplication.instance() is None:
+            _app = QApplication(sys.argv)
+        else:
+            _app = QApplication.instance()
+
+        self.stop_callback = stop_callback
+        self._build_tray()
+
+    def _build_tray(self):
+        self.tray = QSystemTrayIcon()
+        if _ICON:
+            self.tray.setIcon(QIcon(_ICON))
+        self.tray.setToolTip("Sabrina — Idle")
+
+        menu = QMenu()
+        self._status_action = menu.addAction("Idle")
+        self._status_action.setEnabled(False)
+        menu.addSeparator()
+        exit_action = menu.addAction("Exit")
+        exit_action.triggered.connect(self._exit)
+        self.tray.setContextMenu(menu)
+
+    def show(self):
+        self.tray.show()
+
+    def set_listening(self):
+        self.tray.setToolTip("Sabrina — Listening....")
+        self._status_action.setText("Listening....")
+
+    def set_responding(self):
+        self.tray.setToolTip("Sabrina — Responding........")
+        self._status_action.setText("Responding........")
+
+    def set_error(self, message):
+        self.tray.showMessage("Error detected", message, QSystemTrayIcon.Critical, 4000)
+
+    def _exit(self):
+        self.tray.hide()
+        if self.stop_callback:
+            self.stop_callback()
+        if _app:
+            _app.exit()
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+if __name__ == "__main__":
+    def fake_stop():
+        print("Terminated.")
 
-        # Remove title bar
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setMinimumSize(600, 400)
+    win = MainWindow(stop_callback=fake_stop)
+    win.show()
 
-        self._drag_pos = None
+    QTimer.singleShot(1000, win.set_listening)
+    QTimer.singleShot(4000, win.set_responding)
+    QTimer.singleShot(7000, win.set_listening)
 
-        # Layout setup
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-
-        main_layout = QVBoxLayout()
-        top_bar = QHBoxLayout()
-
-        # Close button
-        close_btn = QPushButton("X")
-        close_btn.setFixedSize(30, 30)
-        close_btn.clicked.connect(self.close)
-
-        top_bar.addStretch()
-        top_bar.addWidget(close_btn)
-
-        main_layout.addLayout(top_bar)
-        central_widget.setLayout(main_layout)
-
-    # --- DRAG LOGIC ---
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self._drag_pos = event.globalPosition().toPoint()
-
-    def mouseMoveEvent(self, event):
-        if self._drag_pos:
-            delta = event.globalPosition().toPoint() - self._drag_pos
-            self.move(self.pos() + delta)
-            self._drag_pos = event.globalPosition().toPoint()
-
-    def mouseReleaseEvent(self, event):
-        self._drag_pos = None
-
-
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-
-sys.exit(app.exec())
+    sys.exit(_app.exec())

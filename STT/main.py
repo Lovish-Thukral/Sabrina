@@ -13,7 +13,7 @@ class STT:
         compute_type: str = "int8",
         language: str = "en",
         silence_threshold: float = 3000.0,
-        silence_duration: float = 2.0,
+        silence_duration: float = 5.0,
         max_duration: float = 20.0,
         samplerate: int = 16000,
     ):

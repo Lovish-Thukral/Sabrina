@@ -1,7 +1,7 @@
-# main.py
 import os
 import json
 from llama_cpp import Llama
+from huggingface_hub import scan_cache_dir as scan_cache
 from helpers import save_history, HISTORY_CONTAINER, get_current_screen
 from Core import chat_prompt_gen, Command_Executer, error_handler
 from Tools import Pre_Executor
@@ -47,12 +47,12 @@ def decider():
 
     user = data.get("user", {})
     if not user:
-        raise ValueError("User information not found in UserMetaData.json, re-execute install.sh.")
+        raise ValueError("User information not found in userMetaData.json, re-execute install.sh.")
 
     gpu = user.get("vram")
     cpu = user.get("total_ram")
     model_info = None
-    gpu_available = False  # default
+    gpu_available = False
 
     if gpu not in (None, "N/A", "Unknown"):
         gpu_available = True
@@ -65,26 +65,25 @@ def decider():
             model_info = models["4"]
 
     if cpu in (None, "N/A", "Unknown"):
-        raise ValueError("CPU information not found in UserMetaData.json, re-execute install.sh.")
+        raise ValueError("CPU information not found in userMetaData.json, re-execute install.sh.")
 
     cpu = safe_int(cpu)
-    if cpu >= 15000:
-        model_info = models["6"]
-    elif cpu >= 11000:
-        model_info = models["4"]
-    else:
-        model_info = models["macro_model"]
+    if model_info is None:
+        if cpu >= 15000:
+            model_info = models["6"]
+        elif cpu >= 11000:
+            model_info = models["4"]
+        else:
+            model_info = models["macro_model"]
 
     return {"models": model_info, "gpu": gpu_available}
 
 
 class Sabrina:
     def __init__(self, local_model_path="null"):
-        # 1. UI first — visible immediately so user knows app started
         self.win = MainWindow(stop_callback=self.stop)
         self.win.show()
 
-        # 2. Load everything else after UI is up
         self.device_info = decider()
         self.model_info = self.device_info.get("models", {})
 
@@ -93,19 +92,23 @@ class Sabrina:
             filename=self.model_info["model"],
             localpath=local_model_path
         )
+
         self.stt = STT(
-            model_size=self.model_info["stt"],
-            device="cuda" if self.device_info.get("gpu", False) else "cpu"
+            model_size=self.model_info["stt"]
         )
         self.stt.start()
+
         self.tts = TTS()
         self.tts.start()
+
         self.noinput = 0
-        self.win.set_ready()  
+        self.win.set_ready()
 
     def load_model(self, localpath, repo_id, filename):
         n_gpu_layers = -1
+
         if localpath.endswith(".gguf") and os.path.isfile(localpath):
+            print(f"Loading local model from: {localpath}")
             return Llama(
                 model_path=localpath,
                 n_ctx=8192,
@@ -114,6 +117,20 @@ class Sabrina:
                 temperature=0.1,
                 verbose=False
             )
+
+        try:
+            cache_info = scan_cache()
+            is_cached = any(repo.repo_id == repo_id for repo in cache_info.repos)
+        except Exception:
+            is_cached = False
+
+        if is_cached:
+            os.environ["HF_HUB_OFFLINE"] = "1"
+            print(f"Loading '{repo_id}' from local cache...")
+        else:
+            os.environ.pop("HF_HUB_OFFLINE", None)
+            print(f"Model '{repo_id}' not cached, downloading...")
+
         try:
             return Llama.from_pretrained(
                 repo_id=repo_id,
@@ -122,7 +139,8 @@ class Sabrina:
                 n_threads=4,
                 n_gpu_layers=n_gpu_layers,
                 temperature=0.1,
-                verbose=False
+                verbose=False,
+                local_files_only=is_cached
             )
         except Exception as e:
             raise RuntimeError(f"Model loading failed: {e}")
@@ -148,8 +166,10 @@ class Sabrina:
             print(response)
             print(response["TTS"])
             self.tts.play(response["TTS"])
+
             if self.noinput == 3:
                 System = {"terminate": True}
+
             return {"response": response, "System": System}
 
         except Exception as e:
@@ -165,7 +185,10 @@ class Sabrina:
             return {"Status": "Failed", "response": "No command provided"}
 
         response = Command_Executer(Command=command)
-        HISTORY_CONTAINER.append({"Shell Status:": response["Status"], "Shell Response": response["Response"]})
+        HISTORY_CONTAINER.append({
+            "Shell Status:": response["Status"],
+            "Shell Response": response["Response"]
+        })
 
         if response["Status"] == "Failed":
             errorfound = response.get("Error_Found", "No error info")
@@ -185,12 +208,14 @@ class Sabrina:
             self.win.set_listening()
             input_data = self.stt.listen()
             self.win.set_responding()
+
             response = self.responsed(input_data)
             print(f"Generated Response: {response}")
+
             command = response.get("response", {}).get("CMND", "NONE")
-            # if command != "NONE":
-                # shell = self.execute(command)
-                # response = self.responsed(f"System: Execution Completed\nResult: {shell}")
+            if command != "NONE":
+                shell = self.execute(command)
+                response = self.responsed(f"System: Execution Completed\nResult: {shell}")
 
             if response.get("System", {}).get("terminate", False):
                 break

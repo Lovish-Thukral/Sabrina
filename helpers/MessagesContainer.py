@@ -2,7 +2,7 @@ import json
 import os
 import datetime
 
-MAX_MESSAGES = 20
+MAX_MESSAGES = 10
 MESSAGES = []
 HISTORY_CONTAINER = []
 

@@ -117,8 +117,7 @@ class TTS:
                if chunksSize == 5:
                    player.set()
             streamQueue.put(None)
-            if chunksSize < 5:
-                player.set()
+            player.set()
         
         def stream_audio():
             player.wait()

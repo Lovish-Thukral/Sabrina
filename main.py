@@ -108,8 +108,7 @@ class Sabrina:
         self.agent = None
         self.stt = None
         self.tts = None
-        self.noinput = 0
-        self.bridge.sig_ready.emit()        # safe from main thread too
+        self.noinput = 0      # safe from main thread too
 
     # ── model loading ──────────────────────────────────────────────────────
     def load_model(self, localpath, repo_id, filename):
@@ -179,7 +178,7 @@ class Sabrina:
             filename=self.model_info["model"],
             localpath=local_model_path
         )
-        self.stt = STT(model_size=self.model_info["stt"])
+        self.stt = STT(model_size=self.model_info["stt"], device="cuda" if self.device_info["gpu"] else "cpu")
         self.stt.start()
         self.tts = TTS()
         self.tts.start()
@@ -251,12 +250,6 @@ class Sabrina:
     # ── main worker loop (runs on background thread) ──────────────────────
     def run(self):
         try:
-            show = self.win.show()  # must be called from main thread before starting worker
-            if not show:
-                print("Failed to show GUI.")
-                return
-            self.start()
-            self.bridge.sig_ready.emit()
             while True:
                 self.bridge.sig_listening.emit()
                 input_data = self.stt.listen()
@@ -279,5 +272,20 @@ class Sabrina:
 
 # ── entry point ───────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    sabrina = Sabrina()                     # creates QApplication internally via MainWindow
-    sabrina.run()
+    import sys
+    import threading
+    from PySide6.QtWidgets import QApplication
+
+    sabrina = Sabrina()         # creates QApplication + GUI on main thread
+    sabrina.win.show()          # show tray + snackbar on main thread
+
+    def worker():
+        sabrina.start()         # load model, STT, TTS (blocking — fine on bg thread)
+        sabrina.bridge.sig_ready.emit()
+        sabrina.run()           # main loop (blocking — fine on bg thread)
+
+    t = threading.Thread(target=worker, daemon=True)
+    t.start()
+
+    app = QApplication.instance()
+    sys.exit(app.exec())        # Qt owns the main thread — never block this

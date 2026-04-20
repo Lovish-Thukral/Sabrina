@@ -32,12 +32,12 @@ No API keys. No telemetry. No internet required.
 ## ⚡ Workflow
 
 ```
-🎙️ Speech  →  👂 Vosk (STT)  →  🧠 LLM  →  🔊 NeuTTS (TTS)  →  ⚙️ Terminal
+🎙️ Speech  →  👂 Whisper (STT)  →  🧠 LLM  →  🔊 NeuTTS (TTS)  →  ⚙️ Terminal
 ```
 
 | Step | Component | Role |
 |------|-----------|------|
-| 1 | **Vosk** | Offline speech-to-text |
+| 1 | **whisper** | Offline speech-to-text |
 | 2 | **LLM** | Local language model processing |
 | 3 | **NeuTTS** | Text-to-speech response |
 | 4 | **Terminal** | Command execution |
@@ -46,7 +46,7 @@ No API keys. No telemetry. No internet required.
 
 ## ✨ Features
 
-- 📴 **Offline Speech Recognition** — powered by Vosk, works without internet
+- 📴 **Offline Speech Recognition** — powered by whisperSTT, works without internet
 - 🧠 **Local LLM Support** — bring your own model from HuggingFace
 - 🔊 **Voice Responses** — natural speech output via NeuTTS
 - 💻 **Terminal Command Execution** — interact directly with your system
@@ -75,7 +75,7 @@ cd Sabrina
 
 ### 2. Run the setup script
 
-The setup script handles everything automatically — Python dependencies, PyTorch, llama-cpp-python (CPU or CUDA), NeuTTS, and the Vosk model download.
+The setup script handles everything automatically — Python dependencies, PyTorch, llama-cpp-python (CPU or CUDA), NeuTTS, and the model downloads.
 
 ```bash
 chmod +x setup.sh
@@ -89,10 +89,7 @@ During setup, you'll be prompted:
 
 ### 3. Models
 
-Both models are handled automatically:
-
-- **Vosk** (`vosk-model-en-in-0.5`) — downloaded by `setup.sh` to `models/vosk/`
-- **LLM** (`Qwen2.5-3B-Instruct-GGUF`) — auto-downloaded from HuggingFace on first run
+Models are handled automatically,
 
 > 🛠️ **Want a different LLM?** Edit the defaults in `main.py`:
 > ```python
@@ -101,17 +98,6 @@ Both models are handled automatically:
 >     llm_filename="your-model-file.gguf"
 > )
 > ```
-
-**Slow download for Vosk?** You can manually download a model from [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models), then unzip it directly into the `models/vosk/` folder:
-
-```
-Sabrina/
-└── models/
-    └── vosk/
-        └── vosk-model-en-in-0.5/  ← unzip here manually
-```
-
-> ⚠️ **Using a different Vosk model?** If you download a different model than the default, make sure to update the model path in the STT directory's main file to point to your new model folder.
 
 ### 4. Run
 

@@ -15,7 +15,7 @@ for _name in ("icon.ico", "icon.png"):
 
 
 class SnackBar(QWidget):
-    _BG     = QColor(28, 28, 28)      # solid — no alpha, works without compositor
+    _BG     = QColor(28, 28, 28)
     _FG     = QColor(255, 255, 255)
     _SUB    = QColor(170, 170, 170)
     _GREEN  = QColor(72, 199, 142)
@@ -26,8 +26,6 @@ class SnackBar(QWidget):
     _RADIUS = 8
 
     def __init__(self):
-        # Qt.Window + X11BypassWindowManagerHint = always-on-top, no titlebar, works on X11
-        # Qt.WindowStaysOnTopHint keeps it above normal windows
         flags = (
             Qt.Window
             | Qt.FramelessWindowHint
@@ -54,6 +52,7 @@ class SnackBar(QWidget):
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(self._anim_out.start)
+        return
 
     def _make_anim(self, start, end, ms):
         a = QPropertyAnimation(self._effect, b"opacity", self)
@@ -67,8 +66,9 @@ class SnackBar(QWidget):
         screen = QApplication.primaryScreen().availableGeometry()
         self.move(
             screen.center().x() - self._W // 2,
-            screen.bottom() - self._H - self._MARGIN -30
-    )
+            screen.bottom() - self._H - self._MARGIN - 30
+        )
+        return
 
     def show_message(self, title: str, sub: str, dot_color: QColor, duration_ms: int = 3000):
         self._title     = title
@@ -82,15 +82,17 @@ class SnackBar(QWidget):
         self._effect.setOpacity(0.0)
 
         self.show()
-        self.raise_()                  # bring above other windows
+        self.raise_()
         self._anim_in.start()
 
         if duration_ms > 0:
             self._timer.start(duration_ms)
+        return
 
     def dismiss(self):
         self._timer.stop()
         self._anim_out.start()
+        return
 
     def paintEvent(self, _):
         p = QPainter(self)
@@ -100,12 +102,10 @@ class SnackBar(QWidget):
         path.addRoundedRect(0, 0, self._W, self._H, self._RADIUS, self._RADIUS)
         p.fillPath(path, self._BG)
 
-        # coloured dot
         p.setBrush(self._dot_color)
         p.setPen(Qt.NoPen)
         p.drawEllipse(QPoint(18, self._H // 2), 5, 5)
 
-        # title
         p.setPen(self._FG)
         f = QFont()
         f.setPixelSize(14)
@@ -113,12 +113,12 @@ class SnackBar(QWidget):
         p.setFont(f)
         p.drawText(QRect(34, 8, self._W - 42, 20), Qt.AlignVCenter | Qt.AlignLeft, self._title)
 
-        # subtitle
         p.setPen(self._SUB)
         f.setPixelSize(12)
         f.setWeight(QFont.Normal)
         p.setFont(f)
         p.drawText(QRect(34, 28, self._W - 42, 18), Qt.AlignVCenter | Qt.AlignLeft, self._sub)
+        return
 
 
 class MainWindow:
@@ -129,6 +129,7 @@ class MainWindow:
         self.stop_callback = stop_callback
         self._snack = SnackBar()
         self._build_tray()
+        return
 
     def _build_tray(self):
         self.tray = QSystemTrayIcon()
@@ -147,34 +148,44 @@ class MainWindow:
         quit_action = menu.addAction("Exit")
         quit_action.triggered.connect(self._exit)
         self.tray.setContextMenu(menu)
+        return
 
     def show(self):
         self.tray.show()
         QTimer.singleShot(300, lambda: self._snack.show_message(
             "Sabrina", "Setting up… please wait", SnackBar._BLUE, duration_ms=0
         ))
+        return True
 
     def set_initializing(self):
         self._status_action.setText("Initializing...")
         self.tray.setToolTip("Sabrina — Initializing...")
         self._snack.show_message("Sabrina", "Setting up… please wait", SnackBar._BLUE, duration_ms=0)
+        return True
 
     def set_ready(self):
         self._status_action.setText("Ready")
         self.tray.setToolTip("Sabrina — Ready")
         self._snack.show_message("Sabrina", "Ready!", SnackBar._GREEN, duration_ms=3000)
+        return True
 
     def set_listening(self):
         self._status_action.setText("Listening...")
         self.tray.setToolTip("Sabrina — Listening...")
         self._snack.dismiss()
+        return True
 
     def set_responding(self):
         self._status_action.setText("Responding...")
         self.tray.setToolTip("Sabrina — Responding...")
+        self._snack.show_message("Sabrina", "Thinking...", SnackBar._BLUE, duration_ms=0)
+        return True
 
     def set_error(self, message: str):
+        self._status_action.setText("Error")
+        self.tray.setToolTip("Sabrina — Error")
         self._snack.show_message("Error", message, SnackBar._RED, duration_ms=5000)
+        return True
 
     def _exit(self):
         self.tray.hide()
@@ -183,15 +194,16 @@ class MainWindow:
             self.stop_callback()
         if _app:
             _app.exit()
+        return True
 
 
 if __name__ == "__main__":
     win = MainWindow(stop_callback=lambda: print("Stopped."))
     win.show()
 
-    QTimer.singleShot(4000, win.set_ready)
-    QTimer.singleShot(7000, win.set_listening)
-    QTimer.singleShot(10000, win.set_responding)
-    QTimer.singleShot(13000, win.set_listening)
+    QTimer.singleShot(2000, win.set_ready)
+    QTimer.singleShot(5000, win.set_listening)
+    QTimer.singleShot(8000, win.set_responding)
+    QTimer.singleShot(11000, win.set_listening)
 
     sys.exit(_app.exec())

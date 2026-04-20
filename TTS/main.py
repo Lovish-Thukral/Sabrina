@@ -7,51 +7,6 @@ import threading
 import os
 import re
 
-def sanitize_tts(text: str) -> str:
-    # Remove emojis (broad unicode ranges)
-    text = re.sub(
-        r'[\U00010000-\U0010ffff]', 
-        '', 
-        text
-    )
-
-    # Convert domain-like patterns (google.com → google dot com)
-    text = re.sub(
-        r'\b(\w+)\.(\w+)\b',
-        r'\1 dot \2',
-        text
-    )
-
-    # Replace single dots (not multiple like "...") with "dot"
-    text = re.sub(
-        r'(?<!\.)\.(?!\.)',
-        ' dot ',
-        text
-    )
-
-    # Replace multiple dots with a pause
-    text = re.sub(
-        r'\.{2,}',
-        '.',
-        text
-    )
-
-    # Remove problematic punctuation
-    text = re.sub(
-        r'[;:()<>[\]{}|\\]',
-        '',
-        text
-    )
-
-    # Normalize spaces
-    text = re.sub(
-        r'\s+',
-        ' ',
-        text
-    )
-
-    return text.strip()
-
 
 class TTS:
     """Persistent NeuTTS text-to-speech engine with streaming playback."""
@@ -105,7 +60,6 @@ class TTS:
         cloningScript = self.voiceData[cloning]["Script"]
         streamQueue = queue.Queue()
         player = threading.Event()
-        text = sanitize_tts(text)
         print(f"Playing: {text}")
         
         def generate_audio():

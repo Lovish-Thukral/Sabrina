@@ -91,14 +91,7 @@ After installation, a **`Win+Shift+S`** keyboard shortcut is registered system-w
 During setup, you'll be prompted:
 - **Do you have an NVIDIA GPU?** — enter `y` to install CUDA-accelerated `llama-cpp-python`, or `n` for CPU-only.
 
-> ⚠️ The Vosk Indian English model (`vosk-model-en-in-0.5`) is ~1GB and will be downloaded automatically to `models/vosk/`.
-
-### 3. Models
-
-Both models are handled automatically:
-
-- **Vosk** (`vosk-model-en-in-0.5`) — downloaded by `setup.sh` to `models/vosk/`
-- **LLM** (`Qwen2.5-3B-Instruct-GGUF`) — auto-downloaded from HuggingFace on first run
+> ⚠️ PreDefined Models as per machine will start download varying from 3gb - 8gb total`.
 
 > 🛠️ **Want a different LLM?** Edit the defaults in `main.py`:
 > ```python
@@ -106,20 +99,8 @@ Both models are handled automatically:
 >     llm_repo_id="your-repo/model-name",
 >     llm_filename="your-model-file.gguf"
 > )
-> ```
 
-**Slow download for Vosk?** You can manually download a model from [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models), then unzip it directly into the `models/vosk/` folder:
-
-```
-Sabrina/
-└── models/
-    └── vosk/
-        └── vosk-model-en-in-0.5/  ← unzip here manually
-```
-
-> ⚠️ **Using a different Vosk model?** If you download a different model than the default, make sure to update the model path in the STT directory's main file to point to your new model folder.
-
-### 4. Run
+### 3. Run
 
 ```bash
 python main.py

@@ -37,7 +37,7 @@ No API keys. No telemetry. No internet required.
 
 | Step | Component | Role |
 |------|-----------|------|
-| 1 | **Vosk** | Offline speech-to-text |
+| 1 | **Whisper** | Offline speech-to-text |
 | 2 | **LLM** | Local language model processing |
 | 3 | **NeuTTS** | Text-to-speech response |
 | 4 | **Terminal** | Command execution |
